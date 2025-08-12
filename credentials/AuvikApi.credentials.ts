@@ -70,13 +70,10 @@ export class AuvikApi implements ICredentialType {
   }
 
   authenticate = {
-    type: 'generic',
+    type: 'httpBasicAuth',
     properties: {
-      headers: {
-        Authorization:
-          '={{`Basic ${$base64.encode(($credentials.email || "") + ":" + ($credentials.apiKey || ""))}`}}',
-        Accept: 'application/vnd.api+json',
-      },
+      user: '={{($credentials.email || "").trim()}}',
+      password: '={{($credentials.apiKey || "").trim()}}',
     },
   } as const;
 

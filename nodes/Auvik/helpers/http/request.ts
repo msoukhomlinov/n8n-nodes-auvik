@@ -31,7 +31,7 @@ export async function requestAuvik(this: Context, opts: AuvikRequestOptions): Pr
 
   const requestOptions: any = {
     method: opts.method,
-    uri: `${baseURL}${opts.path}`,
+    url: `${baseURL}${opts.path}`,
     qs: opts.qs,
     body: opts.body,
     json: true,

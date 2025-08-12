@@ -224,6 +224,9 @@ Located in `/.cursor-rules`.
  - Use `Accept: application/vnd.api+json` for JSON:API responses; preserve `include` and `fields[]` params across pagination.
  - Date/time format: `YYYY-MM-DDTHH:mm:ss.SSS[Z]` (ISO 8601 with milliseconds and trailing Z) per spec.
  - Cursor pagination: `page[first]` + `page[after]` (forward) and `page[last]` + `page[before]` (backward); keep original filters intact.
+ - Prefer CommonJS build for n8n nodes; ESM requires explicit `.js` extensions and can break runtime resolution in n8n. Set `package.json:type` to `commonjs` and `tsconfig.json: module` to `CommonJS`.
+ - Trim credential inputs before forming Basic auth (avoid stray whitespace in `email`/`apiKey`).
+ - Use `url` (or `uri`) in request options; both are supported by n8n request helper. We standardise on `url`.
 
 # Scratchpad
 
@@ -282,6 +285,9 @@ Located in `/.cursor-rules`.
 - [x] `README.md`: credentials, region mapping/custom URL, pagination examples, limits. (2025-08-12)
 - [x] Version bump and `CHANGELOG.md`; follow release steps. (2025-08-12)
 - **Acceptance**: CI green; packaged node installs and runs in n8n.
+
+### Fixes
+- [x] Resolve runtime import error in `dist/nodes/Auvik/Auvik.node.js` by switching build to CommonJS (updated `package.json` and `tsconfig.json`). (2025-08-12)
 
 ### Notes
 - Preserve original filters and `include/fields[]` across paginated requests.
