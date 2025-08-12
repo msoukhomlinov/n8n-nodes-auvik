@@ -1,0 +1,37 @@
+{
+  "name": "n8n-nodes-auvik",
+  "version": "0.1.0",
+  "description": "Auvik node for n8n",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.10.0"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.json && npm run copy:assets",
+    "copy:assets": "copyfiles \"nodes/**/*.svg\" dist",
+    "clean": "rimraf dist",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^8.10.0",
+    "@typescript-eslint/parser": "^8.10.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^9.7.0",
+    "eslint-plugin-n8n-nodes-base": "^1.11.0",
+    "n8n-workflow": "^1.82.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.10.0"
+  }
+}

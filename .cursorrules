@@ -219,5 +219,74 @@ Located in `/.cursor-rules`.
 - Prefer 429 status for rate limit detection; avoid brittle message matching.
 - Keep Autotask REST URLs consistent without trailing slashes.
 - Attachment content endpoints use `/data` and require both parent entity ID and attachment ID.
+ - Auvik base URL is region-specific (e.g., `https://auvikapi.au1.my.auvik.com/v1`); provide region selector and a Custom URL option in credentials.
+ - Auvik authentication uses Basic credentials (`email:apiKey`); implement credential test via `GET /authentication/verify`.
+ - Use `Accept: application/vnd.api+json` for JSON:API responses; preserve `include` and `fields[]` params across pagination.
+ - Date/time format: `YYYY-MM-DDTHH:mm:ss.SSS[Z]` (ISO 8601 with milliseconds and trailing Z) per spec.
+ - Cursor pagination: `page[first]` + `page[after]` (forward) and `page[last]` + `page[before]` (backward); keep original filters intact.
 
 # Scratchpad
+
+## Auvik Node — Task Tracker (Aligned with Golden Standards)
+
+### Phase 0: Bootstrap
+- [x] Create `package.json` with `n8n.n8nNodesApiVersion: 1`, `files: ["dist"]`, scripts (`build`, `prepublishOnly`), and `engines.node >= 18.10`. (2025-08-12)
+- [x] Finalize strict `tsconfig.json` and ESLint with `eslint-plugin-n8n-nodes-base`. (2025-08-12)
+- [x] Scaffold directories: `credentials/`, `nodes/Auvik/`, `nodes/Auvik/resources/`, `nodes/Auvik/helpers/{http,options,cache}/`, `nodes/Auvik/constants/`, `nodes/Auvik/types/`, and `index.ts` exports. (2025-08-12)
+- **Acceptance**: `npm run build` succeeds; `npm run lint` clean; `dist/` generated; exports compile.
+  - [x] Build compiles (`npm run build`). (2025-08-12)
+  - [x] Lint configured (flat config). (2025-08-12)
+
+### Phase 1: Credentials
+- [x] Implement `credentials/AuvikApi.credentials.ts` with fields: email, apiKey, region selector (au1/eu1/us1 + Custom URL). (2025-08-12)
+- [x] Add `preAuthentication` to compute base URL from region/custom. (2025-08-12)
+- [x] Implement credential test using `GET /authentication/verify`. (2025-08-12)
+- **Acceptance**: Valid creds pass; invalid creds surface 401 via `NodeApiError` with vendor message.
+
+### Phase 2: HTTP and Core Helpers
+- [x] `helpers/http/request.ts`: central request wrapper (auth header, base URL, JSON:API headers, query assembly, error mapping). (2025-08-12)
+- [x] `helpers/errorHandler.ts`: map 401/403/404/409/422/429/5xx; include vendor `errors[]` when present. (2025-08-12)
+- [x] `helpers/pagination.ts`: cursor iteration preserving filters, `include`, `fields[]`. (2025-08-12)
+- [x] `constants/index.ts`: `API_VERSION=v1`, date format `YYYY-MM-DDTHH:mm:ss.SSS[Z]`, query defaults/limits, UI strings. (2025-08-12)
+- **Acceptance**: Wrapper fetches Tenants and Devices in real calls; simulated 429 triggers backoff.
+
+### Phase 3: Node Shell
+- [x] `nodes/Auvik/Auvik.node.ts`: top-level `resource` and gated `operation` (both with `noDataExpression: true`), compose properties from resource descriptions; simple execute router. (2025-08-12)
+- **Acceptance**: Node loads in Editor; switching resource/operation preserves user inputs and respects `displayOptions` gating.
+
+### Phase 4: Resources (MVP)
+- [x] `resources/tenants/{description.ts,execute.ts}`: read multiple, read multiple detail, read single detail. (2025-08-12)
+- [x] `resources/device/{description.ts,execute.ts}`: read multiple info with filters (deviceType, vendorName, modifiedAfter, etc.), `include=deviceDetail`, `fields[deviceDetail]`. (2025-08-12)
+- [x] `resources/network/{description.ts,execute.ts}`: read multiple info/details. (2025-08-12)
+- [x] `resources/interface/{description.ts,execute.ts}`: read multiple info. (2025-08-12)
+- [x] `resources/alert-history/{description.ts,execute.ts}`: read multiple. (2025-08-12)
+- [x] `resources/alert/{description.ts,execute.ts}`: dismiss alert (mutation). (2025-08-12)
+- [ ] `resources/statistics/{description.ts,execute.ts}`: device and interface stats.
+- **Acceptance**: Each operation returns expected data; pagination works past 100 records.
+
+### Phase 5: Extended Resources
+- [x] Usage (client/device). (2025-08-12)
+- [x] Component (multi/single info). (2025-08-12)
+- [x] Entity (audits/notes multi/single). (2025-08-12)
+- [x] Configuration (multi/single). (2025-08-12)
+- [x] SNMP Poller (settings multi/single/devices + History string/numeric). (2025-08-12)
+ - [x] ASM (selected read endpoints). (2025-08-12)
+- **Acceptance**: Endpoints verified against spec; errors surfaced via `NodeApiError`.
+
+### Phase 6: Load Options UX
+- [x] Dynamic options: tenants list; devices by tenant; networks by tenant; common enums. (2025-08-12)
+- **Acceptance**: Dropdowns load quickly with caching; heavy fields stripped from UI payloads.
+
+### Phase 7: Quality, Docs, Release
+- [x] Lint/type checks; lightweight tests for request wrapper and paginator. (2025-08-12)
+- [x] `README.md`: credentials, region mapping/custom URL, pagination examples, limits. (2025-08-12)
+- [x] Version bump and `CHANGELOG.md`; follow release steps. (2025-08-12)
+- **Acceptance**: CI green; packaged node installs and runs in n8n.
+
+### Notes
+- Preserve original filters and `include/fields[]` across paginated requests.
+- Avoid retries on 401/403; backoff with jitter on 429/503/504.
+
+- ESLint v9+ requires flat config (`eslint.config.js`) with `@typescript-eslint/parser`; avoid legacy `.eslintrc.*` and `.eslintignore`.
+- For n8n nodes, use `NodeConnectionType.Main` for `inputs`/`outputs` instead of string literals to satisfy type checks.
+

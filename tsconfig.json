@@ -7,9 +7,16 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "declaration": true,
+    "sourceMap": false
   },
-  "include": [],
+  "include": [
+    "index.ts",
+    "credentials/**/*.ts",
+    "nodes/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist", "build"]
 }
 

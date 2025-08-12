@@ -35,8 +35,8 @@ coverage/
 .nyc_output/
 
 # Cursor-specific files
-#.cursor-settings.json
-#.cursorcache
-#.cursorconfig
-#.cursorignore
-#.cursorrules
+.cursor-settings.json
+.cursorcache
+.cursorconfig
+.cursorignore
+.cursorrules

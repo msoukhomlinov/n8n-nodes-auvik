@@ -1,18 +1,41 @@
-# Cursor AI Project Boilerplate
+# n8n-nodes-auvik
 
-This repository contains a standardised project structure and configuration for Cursor AI-enhanced development environments. It includes customised settings, rules, and snippets to optimise the development experience with Cursor AI.
+An n8n community node for Auvik’s JSON:API.
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-yellow.svg)](https://buymeacoffee.com/msoukhomlinov)
+### Features
+- Tenants, Devices, Networks, Interfaces, Alert History, Alert Dismiss, Usage (client/device)
+- Cursor-based pagination preserving filters and include/fields
+- Region-aware base URL and Custom URL support
 
-## Support
+### Credentials
+Provide:
+- Email: Auvik user email
+- API Key: Auvik API key
+- Region: `us1`, `eu1`, `au1`, or `Custom URL`
+- Base URL (when Region is Custom): e.g., `https://auvikapi.eu1.my.auvik.com/v1`
 
-If you find this project helpful and would like to support its development:
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/msoukhomlinov)
+Auth is Basic (`email:apiKey`), validated via `GET /authentication/verify`. All requests set `Accept: application/vnd.api+json`.
 
-## License
+### Pagination
+Endpoints use cursor pagination with `page[first]` and `page[after]` (forward). The node automatically follows `links.next.meta.cursor` and preserves original filters, `include`, and `fields[]`.
 
-This project is licensed under the [MIT License](LICENSE).
+### Date/Time Format
+Use ISO 8601 with milliseconds and trailing Z: `YYYY-MM-DDTHH:mm:ss.SSS[Z]`.
 
-## Contributing
+### Usage Examples
+- Devices: filter by deviceType/vendor, include `deviceDetail`, restrict with `fields[deviceDetail]`.
+- Networks: filter by networkType/scanStatus, include `networkDetail`.
+- Interfaces: filter by interfaceType/admin/operational.
+- Alert History: filter severity/status, time windows, dismissed.
+- Alert: dismiss alert by ID.
+- Usage: client usage by date window (optionally per tenant), device usage by ID and date window.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+### Development
+- Build: `npm run build`
+- Lint: `npm run lint`
+
+### License
+MIT — see [LICENSE](LICENSE)
+
+### Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md)
