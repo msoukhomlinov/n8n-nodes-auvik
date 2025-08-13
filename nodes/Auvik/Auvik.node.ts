@@ -149,11 +149,52 @@ export class Auvik implements INodeType {
         const results = await getAllByCursor.call(this, {
           path: '/inventory/device/info',
           qs: tenantsCsv ? { tenants: tenantsCsv } : {},
+          fields: {
+            device:
+              [
+                'displayName',
+                'sysName',
+                'name',
+                'fqdn',
+                'hostname',
+                'hostName',
+                'primaryIp',
+                'primaryIpAddress',
+                'ipAddress',
+                'ipAddresses',
+              ].join(','),
+          },
         });
-        const options = (results || []).map((r: any) => {
-          const name = r?.attributes?.displayName || r?.attributes?.sysName || r?.id;
-          return { name: String(name), value: String(r?.id) };
-        });
+        const options = (results || [])
+          .map((r: any) => {
+            const attrs = (r && r.attributes) || {};
+            const idStr = String(r?.id || '');
+            const shortId = idStr.length >= 6 ? idStr.slice(-6) : idStr.slice(0, 6);
+            const primaryName =
+              attrs.displayName ||
+              attrs.sysName ||
+              attrs.name ||
+              attrs.fqdn ||
+              attrs.hostname ||
+              attrs.hostName ||
+              '';
+            const ip =
+              attrs.primaryIp ||
+              attrs.primaryIpAddress ||
+              attrs.ipAddress ||
+              (Array.isArray(attrs.ipAddresses) ? attrs.ipAddresses[0] : '');
+
+            let label: string;
+            if (!primaryName || primaryName === idStr) {
+              if (ip) label = `${ip} — ${shortId}`;
+              else label = `Device — ${shortId}`;
+            } else {
+              label = ip ? `${primaryName} [${ip}] — ${shortId}` : `${primaryName} — ${shortId}`;
+            }
+
+            return { name: label, value: idStr } as INodePropertyOptions;
+          })
+          .sort((a: INodePropertyOptions, b: INodePropertyOptions) => a.name.localeCompare(b.name));
         await kvFileCache.set(cacheKey, options, 2 * 60 * 1000);
         return options;
       },

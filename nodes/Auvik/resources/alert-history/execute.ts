@@ -3,17 +3,24 @@ import { getAllByCursor } from '../../helpers/pagination';
 import { requestAuvik } from '../../helpers/http/request';
 
 function buildAlertHistoryQuery(this: IExecuteFunctions): IDataObject {
-  const tenants = this.getNodeParameter('tenants', 0, '') as string;
+  const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterSeverity = this.getNodeParameter('filterSeverity', 0, '') as string;
   const filterStatus = this.getNodeParameter('filterStatus', 0, '') as string;
   const filterEntityId = this.getNodeParameter('filterEntityId', 0, '') as string;
   const filterDismissed = this.getNodeParameter('filterDismissed', 0, false) as boolean;
   const filterDispatched = this.getNodeParameter('filterDispatched', 0, false) as boolean;
-  const filterDetectedTimeAfter = this.getNodeParameter('filterDetectedTimeAfter', 0, '') as string;
-  const filterDetectedTimeBefore = this.getNodeParameter('filterDetectedTimeBefore', 0, '') as string;
+  const preset = this.getNodeParameter('detectedTimePreset', 0, 'LAST_7_DAYS') as string;
+  let filterDetectedTimeAfter = this.getNodeParameter('filterDetectedTimeAfter', 0, '') as string;
+  let filterDetectedTimeBefore = this.getNodeParameter('filterDetectedTimeBefore', 0, '') as string;
+  if (preset && preset !== 'CUSTOM') {
+    const { computeDateTimeRangeUtc } = require('../../helpers/options/datePresets');
+    const range = computeDateTimeRangeUtc(preset);
+    filterDetectedTimeAfter = range.from;
+    filterDetectedTimeBefore = range.to;
+  }
 
   const qs: IDataObject = {};
-  if (tenants) qs.tenants = tenants;
+  if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterSeverity) qs['filter[severity]'] = filterSeverity;
   if (filterStatus) qs['filter[status]'] = filterStatus;
   if (filterEntityId) qs['filter[entityId]'] = filterEntityId;

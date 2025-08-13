@@ -226,7 +226,10 @@ Located in `/.cursor-rules`.
  - Cursor pagination: `page[first]` + `page[after]` (forward) and `page[last]` + `page[before]` (backward); keep original filters intact.
  - Prefer CommonJS build for n8n nodes; ESM requires explicit `.js` extensions and can break runtime resolution in n8n. Set `package.json:type` to `commonjs` and `tsconfig.json: module` to `CommonJS`.
  - Trim credential inputs before forming Basic auth (avoid stray whitespace in `email`/`apiKey`).
- - Use `url` (or `uri`) in request options; both are supported by n8n request helper. We standardise on `url`.
+ - Build Authorization header explicitly in request wrapper; avoid `requestWithAuthentication` to prevent header clobbering.
+ - Use `uri` in request options with n8n request helper for maximum compatibility.
+ - Credential Test should set `baseURL` and explicit `Authorization` + `Accept` headers; do not rely on `authenticate` being applied during test.
+ - Tenants API single-detail endpoint `/tenants/detail/{id}` requires `tenantDomainPrefix` as a query parameter; surface this field in UI for both `getManyDetail` and `getOneDetail`, and pass it via `qs`.
 
 # Scratchpad
 
@@ -288,6 +291,9 @@ Located in `/.cursor-rules`.
 
 ### Fixes
 - [x] Resolve runtime import error in `dist/nodes/Auvik/Auvik.node.js` by switching build to CommonJS (updated `package.json` and `tsconfig.json`). (2025-08-12)
+ - [x] Fix Auvik credential test to use `baseURL` + `/authentication/verify` with explicit `Authorization` and `Accept` headers; trim inputs and preserve region/custom mapping. (2025-08-13)
+ - [x] Remove Auvik credential test block from `credentials/AuvikApi.credentials.ts` per decision to rely on operational auth only. (2025-08-13)
+ - [x] Tighten `nodes/Auvik/auvik.svg` viewBox to reduce whitespace around the icon for better fit in n8n UI. (2025-08-13)
 
 ### Notes
 - Preserve original filters and `include/fields[]` across paginated requests.

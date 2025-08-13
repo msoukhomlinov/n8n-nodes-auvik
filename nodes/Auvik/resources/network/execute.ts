@@ -6,8 +6,9 @@ function buildNetworkQuery(this: IExecuteFunctions): IDataObject {
   const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterNetworkType = this.getNodeParameter('filterNetworkType', 0, '') as string;
   const filterScanStatus = this.getNodeParameter('filterScanStatus', 0, '') as string;
-  const filterDevices = this.getNodeParameter('filterDevices', 0, '') as string;
-  const filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
+  const devicesSel = this.getNodeParameter('filterDevices', 0, []) as string[];
+  const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
+  let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
   const includeNetworkDetail = this.getNodeParameter('includeNetworkDetail', 0, false) as boolean;
   const fieldsNetworkDetail = this.getNodeParameter('fieldsNetworkDetail', 0, []) as string[];
 
@@ -15,7 +16,11 @@ function buildNetworkQuery(this: IExecuteFunctions): IDataObject {
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterNetworkType) qs['filter[networkType]'] = filterNetworkType;
   if (filterScanStatus) qs['filter[scanStatus]'] = filterScanStatus;
-  if (filterDevices) qs['filter[devices]'] = filterDevices;
+  if (Array.isArray(devicesSel) && devicesSel.length) qs['filter[devices]'] = devicesSel.join(',');
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+    const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
+    filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
+  }
   if (filterModifiedAfter) {
     const { assertIsoDateTime } = require('../../helpers/validation');
     assertIsoDateTime.call(this, filterModifiedAfter, 'filter[modifiedAfter]');

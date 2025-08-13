@@ -8,7 +8,12 @@ export async function executeAsm(this: IExecuteFunctions): Promise<INodeExecutio
   if (operation === 'getApps') {
     const clientId = this.getNodeParameter('clientId', 0, '') as string;
     const include = this.getNodeParameter('include', 0, '') as string;
-    const queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    const queryDatePreset = this.getNodeParameter('queryDatePreset', 0, 'LAST_30_DAYS') as string;
+    let queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    if (queryDatePreset && queryDatePreset !== 'CUSTOM') {
+      const { computeAfterDateTimeUtc } = await import('../../helpers/options/datePresets');
+      queryDate = computeAfterDateTimeUtc(queryDatePreset as any);
+    }
     const qs: IDataObject = {};
     if (clientId) qs['filter[clientId]'] = clientId;
     if (include) qs.include = include;
@@ -19,7 +24,12 @@ export async function executeAsm(this: IExecuteFunctions): Promise<INodeExecutio
 
   if (operation === 'getClients') {
     const include = this.getNodeParameter('include', 0, '') as string;
-    const queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    const queryDatePreset = this.getNodeParameter('queryDatePreset', 0, 'LAST_30_DAYS') as string;
+    let queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    if (queryDatePreset && queryDatePreset !== 'CUSTOM') {
+      const { computeAfterDateTimeUtc } = await import('../../helpers/options/datePresets');
+      queryDate = computeAfterDateTimeUtc(queryDatePreset as any);
+    }
     const qs: IDataObject = {};
     if (include) qs.include = include; // totals
     if (queryDate) qs['filter[queryDate]'] = queryDate;
@@ -30,7 +40,12 @@ export async function executeAsm(this: IExecuteFunctions): Promise<INodeExecutio
   if (operation === 'getSecurityLogs') {
     const clientId = this.getNodeParameter('clientId', 0, '') as string;
     const include = this.getNodeParameter('include', 0, '') as string;
-    const queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    const queryDatePreset = this.getNodeParameter('queryDatePreset', 0, 'LAST_30_DAYS') as string;
+    let queryDate = this.getNodeParameter('queryDate', 0, '') as string;
+    if (queryDatePreset && queryDatePreset !== 'CUSTOM') {
+      const { computeAfterDateTimeUtc } = await import('../../helpers/options/datePresets');
+      queryDate = computeAfterDateTimeUtc(queryDatePreset as any);
+    }
     const qs: IDataObject = {};
     if (clientId) qs['filter[clientId]'] = clientId;
     if (include) qs.include = include; // users,applications

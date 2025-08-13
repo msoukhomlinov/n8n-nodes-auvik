@@ -72,7 +72,7 @@ export const tenantFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['tenant'],
-        operation: ['getManyDetail'],
+        operation: ['getManyDetail', 'getOneDetail'],
       },
     },
   },

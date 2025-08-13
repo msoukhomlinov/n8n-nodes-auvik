@@ -5,14 +5,29 @@ import { requestAuvik } from '../../helpers/http/request';
 function buildConfigurationQuery(this: IExecuteFunctions): IDataObject {
   const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterDeviceId = this.getNodeParameter('filterDeviceId', 0, '') as string;
-  const filterBackupTimeAfter = this.getNodeParameter('filterBackupTimeAfter', 0, '') as string;
-  const filterBackupTimeBefore = this.getNodeParameter('filterBackupTimeBefore', 0, '') as string;
+  const backupTimePreset = this.getNodeParameter('backupTimePreset', 0, 'LAST_30_DAYS') as string;
+  let filterBackupTimeAfter = this.getNodeParameter('filterBackupTimeAfter', 0, '') as string;
+  let filterBackupTimeBefore = this.getNodeParameter('filterBackupTimeBefore', 0, '') as string;
+  if (backupTimePreset && backupTimePreset !== 'CUSTOM') {
+    const { computeDateTimeRangeUtc } = require('../../helpers/options/datePresets');
+    const range = computeDateTimeRangeUtc(backupTimePreset as any);
+    filterBackupTimeAfter = range.from;
+    filterBackupTimeBefore = range.to;
+  }
   const filterIsRunning = this.getNodeParameter('filterIsRunning', 0, false) as boolean;
   const qs: IDataObject = {};
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterDeviceId) qs['filter[deviceId]'] = filterDeviceId;
-  if (filterBackupTimeAfter) qs['filter[backupTimeAfter]'] = filterBackupTimeAfter;
-  if (filterBackupTimeBefore) qs['filter[backupTimeBefore]'] = filterBackupTimeBefore;
+  if (filterBackupTimeAfter) {
+    const { assertIsoDateTime } = require('../../helpers/validation');
+    assertIsoDateTime.call(this, filterBackupTimeAfter, 'filter[backupTimeAfter]');
+    qs['filter[backupTimeAfter]'] = filterBackupTimeAfter;
+  }
+  if (filterBackupTimeBefore) {
+    const { assertIsoDateTime } = require('../../helpers/validation');
+    assertIsoDateTime.call(this, filterBackupTimeBefore, 'filter[backupTimeBefore]');
+    qs['filter[backupTimeBefore]'] = filterBackupTimeBefore;
+  }
   if (filterIsRunning) qs['filter[isRunning]'] = true;
   return qs;
 }

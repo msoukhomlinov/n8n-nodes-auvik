@@ -31,7 +31,7 @@ export async function requestAuvik(this: Context, opts: AuvikRequestOptions): Pr
 
   const requestOptions: any = {
     method: opts.method,
-    url: `${baseURL}${opts.path}`,
+    uri: `${baseURL}${opts.path}`,
     qs: opts.qs,
     body: opts.body,
     json: true,
@@ -43,17 +43,21 @@ export async function requestAuvik(this: Context, opts: AuvikRequestOptions): Pr
     },
   };
 
+  // Ensure Authorization header is always present (trim inputs to avoid stray whitespace)
+  const email = String(credentials.email ?? '').trim();
+  const apiKey = String(credentials.apiKey ?? '').trim();
+  if (email || apiKey) {
+    const basic = Buffer.from(`${email}:${apiKey}`).toString('base64');
+    requestOptions.headers.Authorization = `Basic ${basic}`;
+  }
+
   const maxRetries = opts.maxRetries ?? DEFAULT_MAX_RETRIES;
 
   let attempt = 0;
   while (true) {
     try {
-      // Use credential-based auth headers from credential definition
-      const response = await this.helpers.requestWithAuthentication.call(
-        this,
-        'auvikApi',
-        requestOptions,
-      );
+      // Send request with explicit headers we set above to avoid auth header clobbering
+      const response = await this.helpers.request.call(this, requestOptions);
       return response;
     } catch (error) {
       const status = (error as any)?.statusCode as number | undefined;

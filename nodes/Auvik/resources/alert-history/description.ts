@@ -53,11 +53,38 @@ export const alertHistoryFields: INodeProperties[] = [
     },
   },
   {
+    displayName: 'Detected Time Preset',
+    name: 'detectedTimePreset',
+    type: 'options',
+    default: 'LAST_7_DAYS',
+    options: [
+      { name: 'Today', value: 'TODAY' },
+      { name: 'Yesterday', value: 'YESTERDAY' },
+      { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
+      { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
+      { name: 'Last 7 days', value: 'LAST_7_DAYS' },
+      { name: 'Last 14 days', value: 'LAST_14_DAYS' },
+      { name: 'Last 30 days', value: 'LAST_30_DAYS' },
+      { name: 'Last 90 days', value: 'LAST_90_DAYS' },
+      { name: 'This week', value: 'THIS_WEEK' },
+      { name: 'This month', value: 'THIS_MONTH' },
+      { name: 'Last month', value: 'LAST_MONTH' },
+      { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
+      { name: 'Year to date', value: 'YEAR_TO_DATE' },
+      { name: 'Custom', value: 'CUSTOM' },
+    ],
+    description: 'Quickly select detected time range; choose Custom to enter specific values below',
+    displayOptions: { show: { resource: ['alertHistory'], operation: ['getMany'] } },
+  },
+  {
     displayName: 'Tenants',
     name: 'tenants',
-    type: 'string',
-    default: '',
-    description: 'Comma delimited list of tenant IDs to request info from',
+    type: 'multiOptions',
+    typeOptions: {
+      loadOptionsMethod: 'getTenants',
+    },
+    default: [],
+    description: 'Select one or more tenants to query',
     displayOptions: {
       show: {
         resource: ['alertHistory'],
@@ -144,10 +171,12 @@ export const alertHistoryFields: INodeProperties[] = [
     type: 'string',
     default: '',
     placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
+    description: 'Lower bound of detected time',
     displayOptions: {
       show: {
         resource: ['alertHistory'],
         operation: ['getMany'],
+        detectedTimePreset: ['CUSTOM'],
       },
     },
   },
@@ -157,10 +186,12 @@ export const alertHistoryFields: INodeProperties[] = [
     type: 'string',
     default: '',
     placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
+    description: 'Upper bound of detected time',
     displayOptions: {
       show: {
         resource: ['alertHistory'],
         operation: ['getMany'],
+        detectedTimePreset: ['CUSTOM'],
       },
     },
   },

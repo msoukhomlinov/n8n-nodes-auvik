@@ -1,5 +1,4 @@
 import type {
-  ICredentialTestRequest,
   ICredentialType,
   INodeProperties,
   IHttpRequestHelper,
@@ -66,28 +65,24 @@ export class AuvikApi implements ICredentialType {
       region === 'custom' && customBase
         ? customBase
         : `https://auvikapi.${region}.my.auvik.com/v1`;
-    return { computedBaseUrl: resolved };
+    const email = String(credentials.email || '').trim();
+    const apiKey = String(credentials.apiKey || '').trim();
+    const basic = `Basic ${Buffer.from(`${email}:${apiKey}`).toString('base64')}`;
+    return { computedBaseUrl: resolved, computedAuthHeader: basic };
   }
 
+  // Provide generic authenticate so Credential Test can attach Basic header automatically
   authenticate = {
-    type: 'httpBasicAuth',
+    type: 'generic',
     properties: {
-      user: '={{($credentials.email || "").trim()}}',
-      password: '={{($credentials.apiKey || "").trim()}}',
-    },
-  } as const;
-
-  test: ICredentialTestRequest = {
-    request: {
-      baseURL:
-        '={{$credentials.computedBaseUrl || ($credentials.region === "custom" ? $credentials.baseUrl : `https://auvikapi.${$credentials.region}.my.auvik.com/v1`)}}',
-      url: '/authentication/verify',
-      method: 'GET',
       headers: {
+        Authorization:
+          '={{"Basic " + $base64.encode((($credentials.email || "").trim()) + ":" + (($credentials.apiKey || "").trim()))}}',
         Accept: 'application/vnd.api+json',
       },
     },
-  };
+  } as const;
+
 }
 
 

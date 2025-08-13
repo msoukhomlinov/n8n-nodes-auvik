@@ -2,6 +2,16 @@
   "name": "n8n-nodes-auvik",
   "version": "0.1.0",
   "description": "Auvik node for n8n",
+  "author": "Max Soukhomlinov <maxs@intellectit.com.au>",
+  "homepage": "https://www.intellectit.com.au",
+  "keywords": [
+    "n8n",
+    "n8n-community-node",
+    "auvik"
+  ],
+  "bugs": {
+    "email": "maxs@intellectit.com.au"
+  },
   "license": "MIT",
   "type": "commonjs",
   "main": "dist/index.js",

@@ -28,6 +28,35 @@ export const usageOperations: INodeProperties = {
 export const usageFields: INodeProperties[] = [
   // Common date filters
   {
+    displayName: 'Date Preset',
+    name: 'datePreset',
+    type: 'options',
+    default: 'LAST_30_DAYS',
+    options: [
+      { name: 'Today', value: 'TODAY' },
+      { name: 'Yesterday', value: 'YESTERDAY' },
+      { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
+      { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
+      { name: 'Last 7 days', value: 'LAST_7_DAYS' },
+      { name: 'Last 14 days', value: 'LAST_14_DAYS' },
+      { name: 'Last 30 days', value: 'LAST_30_DAYS' },
+      { name: 'Last 90 days', value: 'LAST_90_DAYS' },
+      { name: 'This week', value: 'THIS_WEEK' },
+      { name: 'This month', value: 'THIS_MONTH' },
+      { name: 'Last month', value: 'LAST_MONTH' },
+      { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
+      { name: 'Year to date', value: 'YEAR_TO_DATE' },
+      { name: 'Custom', value: 'CUSTOM' },
+    ],
+    description: 'Quickly select a date range. Choose Custom to enter specific dates.',
+    displayOptions: {
+      show: {
+        resource: ['usage'],
+        operation: ['getClient', 'getDevice'],
+      },
+    },
+  },
+  {
     displayName: 'From Date',
     name: 'fromDate',
     type: 'string',
@@ -39,6 +68,7 @@ export const usageFields: INodeProperties[] = [
       show: {
         resource: ['usage'],
         operation: ['getClient', 'getDevice'],
+        datePreset: ['CUSTOM'],
       },
     },
   },
@@ -54,6 +84,7 @@ export const usageFields: INodeProperties[] = [
       show: {
         resource: ['usage'],
         operation: ['getClient', 'getDevice'],
+        datePreset: ['CUSTOM'],
       },
     },
   },
@@ -61,9 +92,10 @@ export const usageFields: INodeProperties[] = [
   {
     displayName: 'Tenants',
     name: 'tenants',
-    type: 'string',
-    default: '',
-    description: 'Comma delimited list of tenant IDs to request info from',
+    type: 'multiOptions',
+    typeOptions: { loadOptionsMethod: 'getTenants' },
+    default: [],
+    description: 'Select one or more tenants to query',
     displayOptions: {
       show: {
         resource: ['usage'],
@@ -73,11 +105,13 @@ export const usageFields: INodeProperties[] = [
   },
   // Device usage specific
   {
-    displayName: 'Device ID',
+    displayName: 'Device',
     name: 'id',
-    type: 'string',
+    type: 'options',
+    typeOptions: { loadOptionsMethod: 'getDevicesByTenant' },
     required: true,
     default: '',
+    description: 'Select a device',
     displayOptions: {
       show: {
         resource: ['usage'],

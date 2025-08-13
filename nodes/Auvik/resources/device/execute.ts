@@ -8,8 +8,10 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   const filterVendorName = this.getNodeParameter('filterVendorName', 0, '') as string;
   const filterMakeModel = this.getNodeParameter('filterMakeModel', 0, '') as string;
   const filterOnlineStatus = this.getNodeParameter('filterOnlineStatus', 0, '') as string;
-  const filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
-  const filterNotSeenSince = this.getNodeParameter('filterNotSeenSince', 0, '') as string;
+  const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
+  let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
+  const notSeenSincePreset = this.getNodeParameter('notSeenSincePreset', 0, 'LAST_7_DAYS') as string;
+  let filterNotSeenSince = this.getNodeParameter('filterNotSeenSince', 0, '') as string;
   const filterStateKnown = this.getNodeParameter('filterStateKnown', 0, false) as boolean;
   const includeDeviceDetail = this.getNodeParameter('includeDeviceDetail', 0, false) as boolean;
   const fieldsDeviceDetail = this.getNodeParameter('fieldsDeviceDetail', 0, []) as string[];
@@ -20,10 +22,18 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   if (filterVendorName) qs['filter[vendorName]'] = filterVendorName;
   if (filterMakeModel) qs['filter[makeModel]'] = filterMakeModel;
   if (filterOnlineStatus) qs['filter[onlineStatus]'] = filterOnlineStatus;
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+    const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
+    filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
+  }
   if (filterModifiedAfter) {
     const { assertIsoDateTime } = require('../../helpers/validation');
     assertIsoDateTime.call(this, filterModifiedAfter, 'filter[modifiedAfter]');
     qs['filter[modifiedAfter]'] = filterModifiedAfter;
+  }
+  if (notSeenSincePreset && notSeenSincePreset !== 'CUSTOM') {
+    const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
+    filterNotSeenSince = computeAfterDateTimeUtc(notSeenSincePreset);
   }
   if (filterNotSeenSince) {
     const { assertIsoDateTime } = require('../../helpers/validation');

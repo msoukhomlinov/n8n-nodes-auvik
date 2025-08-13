@@ -41,9 +41,11 @@ export async function executeTenant(this: IExecuteFunctions): Promise<INodeExecu
 
   if (operation === 'getOneDetail') {
     const id = this.getNodeParameter('id', 0) as string;
+    const tenantDomainPrefix = this.getNodeParameter('tenantDomainPrefix', 0) as string;
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/tenants/detail/${encodeURIComponent(id)}`,
+      qs: { tenantDomainPrefix },
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);

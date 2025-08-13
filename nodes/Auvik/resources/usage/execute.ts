@@ -5,8 +5,15 @@ export async function executeUsage(this: IExecuteFunctions): Promise<INodeExecut
   const returnData: IDataObject[] = [];
   const operation = this.getNodeParameter('operation', 0) as string;
 
-  const fromDate = this.getNodeParameter('fromDate', 0) as string;
-  const thruDate = this.getNodeParameter('thruDate', 0) as string;
+  let fromDate = this.getNodeParameter('fromDate', 0, '') as string;
+  let thruDate = this.getNodeParameter('thruDate', 0, '') as string;
+  const datePreset = this.getNodeParameter('datePreset', 0, 'LAST_30_DAYS') as string;
+  if (datePreset && datePreset !== 'CUSTOM') {
+    const { computeDateRangeUtc } = await import('../../helpers/options/datePresets');
+    const range = computeDateRangeUtc(datePreset as any);
+    fromDate = range.from;
+    thruDate = range.to;
+  }
   if (fromDate) {
     const { assertDate } = await import('../../helpers/validation');
     assertDate.call(this, fromDate, 'filter[fromDate]');
@@ -17,12 +24,12 @@ export async function executeUsage(this: IExecuteFunctions): Promise<INodeExecut
   }
 
   if (operation === 'getClient') {
-    const tenants = this.getNodeParameter('tenants', 0, '') as string;
+    const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
     const qs: IDataObject = {
       'filter[fromDate]': fromDate,
       'filter[thruDate]': thruDate,
     };
-    if (tenants) qs.tenants = tenants;
+    if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
 
     const resp = await requestAuvik.call(this, {
       method: 'GET',

@@ -73,6 +73,7 @@ export const networkFields: INodeProperties[] = [
     name: 'filterNetworkType',
     type: 'options',
     options: [
+      { name: 'Any', value: '' },
       { name: 'Routed', value: 'routed' },
       { name: 'VLAN', value: 'vlan' },
       { name: 'WiFi', value: 'wifi' },
@@ -81,7 +82,7 @@ export const networkFields: INodeProperties[] = [
       { name: 'Layer 2', value: 'layer2' },
       { name: 'Internet', value: 'internet' },
     ],
-    default: 'routed',
+    default: '',
     displayOptions: {
       show: {
         resource: ['network'],
@@ -94,12 +95,13 @@ export const networkFields: INodeProperties[] = [
     name: 'filterScanStatus',
     type: 'options',
     options: [
+      { name: 'Any', value: '' },
       { name: 'True', value: 'true' },
       { name: 'False', value: 'false' },
       { name: 'Not Allowed', value: 'notAllowed' },
       { name: 'Unknown', value: 'unknown' },
     ],
-    default: 'true',
+    default: '',
     displayOptions: {
       show: {
         resource: ['network'],
@@ -110,15 +112,39 @@ export const networkFields: INodeProperties[] = [
   {
     displayName: 'Devices',
     name: 'filterDevices',
-    type: 'string',
-    default: '',
-    description: 'Comma-delimited device IDs on this network',
+    type: 'multiOptions',
+    typeOptions: { loadOptionsMethod: 'getDevicesByTenant', loadOptionsDependsOn: ['tenants'] },
+    default: [],
+    description: 'Select one or more devices on this network',
     displayOptions: {
       show: {
         resource: ['network'],
         operation: ['getMany'],
       },
     },
+  },
+  {
+    displayName: 'Modified After Preset',
+    name: 'modifiedAfterPreset',
+    type: 'options',
+    default: 'CUSTOM',
+    options: [
+      { name: 'Today', value: 'TODAY' },
+      { name: 'Yesterday', value: 'YESTERDAY' },
+      { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
+      { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
+      { name: 'Last 7 days', value: 'LAST_7_DAYS' },
+      { name: 'Last 14 days', value: 'LAST_14_DAYS' },
+      { name: 'Last 30 days', value: 'LAST_30_DAYS' },
+      { name: 'Last 90 days', value: 'LAST_90_DAYS' },
+      { name: 'This week', value: 'THIS_WEEK' },
+      { name: 'This month', value: 'THIS_MONTH' },
+      { name: 'Last month', value: 'LAST_MONTH' },
+      { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
+      { name: 'Year to date', value: 'YEAR_TO_DATE' },
+      { name: 'Custom', value: 'CUSTOM' },
+    ],
+    displayOptions: { show: { resource: ['network'], operation: ['getMany'] } },
   },
   {
     displayName: 'Modified After',
@@ -130,6 +156,7 @@ export const networkFields: INodeProperties[] = [
       show: {
         resource: ['network'],
         operation: ['getMany'],
+        modifiedAfterPreset: ['CUSTOM'],
       },
     },
   },

@@ -8,7 +8,8 @@ function buildInterfaceQuery(this: IExecuteFunctions): IDataObject {
   const filterParentDevice = this.getNodeParameter('filterParentDevice', 0, '') as string;
   const filterAdminStatus = this.getNodeParameter('filterAdminStatus', 0, false) as boolean;
   const filterOperationalStatus = this.getNodeParameter('filterOperationalStatus', 0, '') as string;
-  const filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
+  const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
+  let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
 
   const qs: IDataObject = {};
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
@@ -16,6 +17,10 @@ function buildInterfaceQuery(this: IExecuteFunctions): IDataObject {
   if (filterParentDevice) qs['filter[parentDevice]'] = filterParentDevice;
   if (filterAdminStatus) qs['filter[adminStatus]'] = true;
   if (filterOperationalStatus) qs['filter[operationalStatus]'] = filterOperationalStatus;
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+    const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
+    filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
+  }
   if (filterModifiedAfter) {
     const { assertIsoDateTime } = require('../../helpers/validation');
     assertIsoDateTime.call(this, filterModifiedAfter, 'filter[modifiedAfter]');
