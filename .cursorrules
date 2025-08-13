@@ -230,6 +230,8 @@ Located in `/.cursor-rules`.
  - Use `uri` in request options with n8n request helper for maximum compatibility.
  - Credential Test should set `baseURL` and explicit `Authorization` + `Accept` headers; do not rely on `authenticate` being applied during test.
  - Tenants API single-detail endpoint `/tenants/detail/{id}` requires `tenantDomainPrefix` as a query parameter; surface this field in UI for both `getManyDetail` and `getOneDetail`, and pass it via `qs`.
+ - Do not serialise credentials in cache keys; scope caches to resolved API base URL only.
+ - Do not return computed Basic `Authorization` from credential pre-auth; compute headers at request time only.
 
 # Scratchpad
 
@@ -277,6 +279,8 @@ Located in `/.cursor-rules`.
 - [x] Configuration (multi/single). (2025-08-12)
 - [x] SNMP Poller (settings multi/single/devices + History string/numeric). (2025-08-12)
  - [x] ASM (selected read endpoints). (2025-08-12)
+- [x] Playbook (composites): Triage Alerts, Health Snapshot, Search Entities (2025-08-13)
+  - [x] Centralised date preset options and aligned Health Snapshot lookback with Triage Alerts (default LAST_7_DAYS). Structured Health Snapshot output with counts and grouped sections. (2025-08-13)
 - **Acceptance**: Endpoints verified against spec; errors surfaced via `NodeApiError`.
 
 ### Phase 6: Load Options UX
@@ -301,4 +305,11 @@ Located in `/.cursor-rules`.
 
 - ESLint v9+ requires flat config (`eslint.config.js`) with `@typescript-eslint/parser`; avoid legacy `.eslintrc.*` and `.eslintignore`.
 - For n8n nodes, use `NodeConnectionType.Main` for `inputs`/`outputs` instead of string literals to satisfy type checks.
+
+## Playbook Support Matrix (from `.docs/auvik/openapi-spec.json`)
+- Alert triage: supported via `/alert/history/info` and `/alert/dismiss/{id}`
+- Health snapshot: supported via `/inventory/device/info`, `/inventory/interface/info`, `/alert/history/info`, optional ASM via `/asm/client/info`
+- Config drift: removed — Auvik API does not expose configuration content; attribute-only diffs provide limited value
+- Maintenance windows: no public endpoint found → not supported
+- Poller rollout: listing and devices via `/settings/snmppoller` and `/settings/snmppoller/{id}/devices`; no assignment endpoint → rollout write op not supported
 

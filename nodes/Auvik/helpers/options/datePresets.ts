@@ -1,8 +1,17 @@
 export type DateRangePreset =
+  | 'LAST_5_MINUTES'
+  | 'LAST_15_MINUTES'
+  | 'LAST_30_MINUTES'
+  | 'LAST_1_HOUR'
+  | 'LAST_2_HOURS'
+  | 'LAST_4_HOURS'
+  | 'LAST_6_HOURS'
+  | 'LAST_12_HOURS'
   | 'TODAY'
   | 'YESTERDAY'
   | 'LAST_24_HOURS'
   | 'LAST_48_HOURS'
+  | 'LAST_3_DAYS'
   | 'LAST_7_DAYS'
   | 'LAST_14_DAYS'
   | 'LAST_30_DAYS'
@@ -12,6 +21,31 @@ export type DateRangePreset =
   | 'LAST_MONTH'
   | 'QUARTER_TO_DATE'
   | 'YEAR_TO_DATE';
+
+// Centralised options list for n8n UI fields that use date-time presets
+export const dateTimePresetOptions: Array<{ name: string; value: DateRangePreset }> = [
+  { name: 'Last 5 minutes', value: 'LAST_5_MINUTES' },
+  { name: 'Last 15 minutes', value: 'LAST_15_MINUTES' },
+  { name: 'Last 30 minutes', value: 'LAST_30_MINUTES' },
+  { name: 'Last 1 hour', value: 'LAST_1_HOUR' },
+  { name: 'Last 2 hours', value: 'LAST_2_HOURS' },
+  { name: 'Last 4 hours', value: 'LAST_4_HOURS' },
+  { name: 'Last 6 hours', value: 'LAST_6_HOURS' },
+  { name: 'Last 12 hours', value: 'LAST_12_HOURS' },
+  { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
+  { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
+  { name: 'Last 3 days', value: 'LAST_3_DAYS' },
+  { name: 'Last 7 days', value: 'LAST_7_DAYS' },
+  { name: 'Last 14 days', value: 'LAST_14_DAYS' },
+  { name: 'Last 30 days', value: 'LAST_30_DAYS' },
+  { name: 'This week (to now)', value: 'THIS_WEEK' },
+  { name: 'Today', value: 'TODAY' },
+  { name: 'Yesterday', value: 'YESTERDAY' },
+  { name: 'This month (to now)', value: 'THIS_MONTH' },
+  { name: 'Last month', value: 'LAST_MONTH' },
+  { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
+  { name: 'Year to date', value: 'YEAR_TO_DATE' },
+];
 
 function pad(num: number, width = 2): string {
   const s = String(num);
@@ -65,6 +99,38 @@ export function computeDateTimeRangeUtc(preset: DateRangePreset): { from: string
   let to: Date;
 
   switch (preset) {
+    case 'LAST_5_MINUTES':
+      from = new Date(now.getTime() - 5 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_15_MINUTES':
+      from = new Date(now.getTime() - 15 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_30_MINUTES':
+      from = new Date(now.getTime() - 30 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_1_HOUR':
+      from = new Date(now.getTime() - 1 * 60 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_2_HOURS':
+      from = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_4_HOURS':
+      from = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_6_HOURS':
+      from = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_12_HOURS':
+      from = new Date(now.getTime() - 12 * 60 * 60 * 1000);
+      to = now;
+      break;
     case 'TODAY':
       from = startOfDayUtc(now);
       to = endOfDayUtc(now);
@@ -81,6 +147,10 @@ export function computeDateTimeRangeUtc(preset: DateRangePreset): { from: string
       break;
     case 'LAST_48_HOURS':
       from = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+      to = now;
+      break;
+    case 'LAST_3_DAYS':
+      from = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
       to = now;
       break;
     case 'LAST_7_DAYS':

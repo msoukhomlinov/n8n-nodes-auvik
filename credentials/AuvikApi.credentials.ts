@@ -67,8 +67,7 @@ export class AuvikApi implements ICredentialType {
         : `https://auvikapi.${region}.my.auvik.com/v1`;
     const email = String(credentials.email || '').trim();
     const apiKey = String(credentials.apiKey || '').trim();
-    const basic = `Basic ${Buffer.from(`${email}:${apiKey}`).toString('base64')}`;
-    return { computedBaseUrl: resolved, computedAuthHeader: basic };
+    return { computedBaseUrl: resolved };
   }
 
   // Provide generic authenticate so Credential Test can attach Basic header automatically

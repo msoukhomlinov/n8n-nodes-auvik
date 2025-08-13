@@ -33,6 +33,9 @@ import { snmpFields, snmpOperations } from './resources/snmp/description';
 import { executeSnmp } from './resources/snmp/execute';
 import { asmFields, asmOperations } from './resources/asm/description';
 import { executeAsm } from './resources/asm/execute';
+import { resolveBaseUrl } from './constants/index';
+import { playbookFields, playbookOperations } from './resources/playbook/description';
+import { executePlaybook } from './resources/playbook/execute';
 
 export class Auvik implements INodeType {
   description: INodeTypeDescription = {
@@ -94,6 +97,7 @@ export class Auvik implements INodeType {
           { name: 'Entity', value: 'entity' },
           { name: 'SNMP Poller', value: 'snmp' },
           { name: 'ASM', value: 'asm' },
+          { name: 'Playbook', value: 'playbook' },
         ],
         default: 'tenant',
       },
@@ -121,6 +125,8 @@ export class Auvik implements INodeType {
       ...snmpFields,
       asmOperations,
       ...asmFields,
+      playbookOperations,
+      ...playbookFields,
     ],
   };
 
@@ -128,7 +134,10 @@ export class Auvik implements INodeType {
     loadOptions: {
       async getTenants(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const creds = await this.getCredentials('auvikApi');
-        const cacheKey = buildCacheKey(['tenants', creds ? JSON.stringify(creds) : '']);
+        const region = String((creds as any)?.region ?? 'us1');
+        const customBaseUrl = ((creds as any)?.baseUrl as string) || undefined;
+        const baseURL = ((creds as any)?.computedBaseUrl as string) || resolveBaseUrl(region, customBaseUrl);
+        const cacheKey = buildCacheKey(['tenants', baseURL]);
         const cached = await kvFileCache.get<INodePropertyOptions[]>(cacheKey);
         if (cached) return cached;
         const results = await getAllByCursor.call(this, { path: '/tenants' });
@@ -143,7 +152,10 @@ export class Auvik implements INodeType {
         const selectedTenants = (this.getCurrentNodeParameter('tenants') as string[]) || [];
         const tenantsCsv = Array.isArray(selectedTenants) ? selectedTenants.join(',') : String(selectedTenants || '');
         const creds = await this.getCredentials('auvikApi');
-        const cacheKey = buildCacheKey(['devicesByTenant', tenantsCsv, creds ? JSON.stringify(creds) : '']);
+        const region = String((creds as any)?.region ?? 'us1');
+        const customBaseUrl = ((creds as any)?.baseUrl as string) || undefined;
+        const baseURL = ((creds as any)?.computedBaseUrl as string) || resolveBaseUrl(region, customBaseUrl);
+        const cacheKey = buildCacheKey(['devicesByTenant', tenantsCsv, baseURL]);
         const cached = await kvFileCache.get<INodePropertyOptions[]>(cacheKey);
         if (cached) return cached;
         const results = await getAllByCursor.call(this, {
@@ -152,16 +164,19 @@ export class Auvik implements INodeType {
           fields: {
             device:
               [
+                // Prefer canonical API fields first
+                'deviceName',
+                'ipAddresses',
+                // Fallbacks observed in responses
+                'ipAddress',
+                'primaryIp',
+                'primaryIpAddress',
                 'displayName',
                 'sysName',
                 'name',
                 'fqdn',
                 'hostname',
                 'hostName',
-                'primaryIp',
-                'primaryIpAddress',
-                'ipAddress',
-                'ipAddresses',
               ].join(','),
           },
         });
@@ -170,27 +185,32 @@ export class Auvik implements INodeType {
             const attrs = (r && r.attributes) || {};
             const idStr = String(r?.id || '');
             const shortId = idStr.length >= 6 ? idStr.slice(-6) : idStr.slice(0, 6);
-            const primaryName =
+            const candidatePrimary =
+              attrs.deviceName ||
               attrs.displayName ||
               attrs.sysName ||
               attrs.name ||
               attrs.fqdn ||
-              attrs.hostname ||
-              attrs.hostName ||
               '';
-            const ip =
+            const ipRaw =
               attrs.primaryIp ||
               attrs.primaryIpAddress ||
               attrs.ipAddress ||
               (Array.isArray(attrs.ipAddresses) ? attrs.ipAddresses[0] : '');
+            const candidatePrimaryNotId = candidatePrimary && candidatePrimary !== idStr ? String(candidatePrimary) : '';
+            const primaryName = candidatePrimaryNotId && String(candidatePrimaryNotId).toLowerCase() !== String(ipRaw || '').toLowerCase()
+              ? candidatePrimaryNotId
+              : '';
+            const host = attrs.hostname || attrs.hostName || '';
+            const ip = ipRaw ? String(ipRaw) : '';
 
-            let label: string;
-            if (!primaryName || primaryName === idStr) {
-              if (ip) label = `${ip} — ${shortId}`;
-              else label = `Device — ${shortId}`;
-            } else {
-              label = ip ? `${primaryName} [${ip}] — ${shortId}` : `${primaryName} — ${shortId}`;
-            }
+            const baseName = (primaryName || host || ip || 'Device').toString().trim();
+            const sameHostAsPrimary = host && primaryName && host.toString().trim().toLowerCase() === primaryName.toString().trim().toLowerCase();
+            const hostIsIp = host && ip && host.toString().trim().toLowerCase() === ip.toString().trim().toLowerCase();
+            const hostPart = host && !sameHostAsPrimary && !hostIsIp ? ` (${String(host).trim()})` : '';
+            const ipEqualsBase = ip && baseName && ip.toString().trim().toLowerCase() === baseName.toLowerCase();
+            const ipPart = ip && !ipEqualsBase ? ` [${ip}]` : '';
+            const label = `${baseName}${hostPart}${ipPart} — ${shortId}`;
 
             return { name: label, value: idStr } as INodePropertyOptions;
           })
@@ -202,7 +222,10 @@ export class Auvik implements INodeType {
         const selectedTenants = (this.getCurrentNodeParameter('tenants') as string[]) || [];
         const tenantsCsv = Array.isArray(selectedTenants) ? selectedTenants.join(',') : String(selectedTenants || '');
         const creds = await this.getCredentials('auvikApi');
-        const cacheKey = buildCacheKey(['networksByTenant', tenantsCsv, creds ? JSON.stringify(creds) : '']);
+        const region = String((creds as any)?.region ?? 'us1');
+        const customBaseUrl = ((creds as any)?.baseUrl as string) || undefined;
+        const baseURL = ((creds as any)?.computedBaseUrl as string) || resolveBaseUrl(region, customBaseUrl);
+        const cacheKey = buildCacheKey(['networksByTenant', tenantsCsv, baseURL]);
         const cached = await kvFileCache.get<INodePropertyOptions[]>(cacheKey);
         if (cached) return cached;
         const results = await getAllByCursor.call(this, {
@@ -256,6 +279,9 @@ export class Auvik implements INodeType {
     }
     if (resource === 'asm') {
       return await executeAsm.call(this);
+    }
+    if (resource === 'playbook') {
+      return await executePlaybook.call(this);
     }
     return [this.helpers.returnJsonArray([])];
   }

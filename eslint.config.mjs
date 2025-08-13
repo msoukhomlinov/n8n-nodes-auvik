@@ -21,7 +21,6 @@ export default [
       'n8n-nodes-base': n8nPlugin,
     },
     rules: {
-      // Tune rules as the implementation grows
       'n8n-nodes-base/node-class-description-extends-from-abstract': 'off',
       '@typescript-eslint/no-var-requires': 'off',
     },
