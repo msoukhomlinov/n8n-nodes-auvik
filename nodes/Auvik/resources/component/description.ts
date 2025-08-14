@@ -41,7 +41,7 @@ export const componentFields: INodeProperties[] = [
     default: [],
     displayOptions: { show: { resource: ['component'], operation: ['getMany'] } },
   },
-  { displayName: 'Modified After', name: 'filterModifiedAfter', type: 'string', default: '', displayOptions: { show: { resource: ['component'], operation: ['getMany'] } } },
+  { displayName: 'Modified After', name: 'filterModifiedAfter', type: 'string', default: '', placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', description: 'Lower bound of modified time (ISO 8601 UTC)', displayOptions: { show: { resource: ['component'], operation: ['getMany'] } } },
   { displayName: 'Device ID', name: 'filterDeviceId', type: 'string', default: '', displayOptions: { show: { resource: ['component'], operation: ['getMany'] } } },
   { displayName: 'Device Name', name: 'filterDeviceName', type: 'string', default: '', displayOptions: { show: { resource: ['component'], operation: ['getMany'] } } },
   {

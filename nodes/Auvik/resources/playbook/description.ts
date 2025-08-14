@@ -10,7 +10,6 @@ export const playbookOperations: INodeProperties = {
   options: [
     { name: 'Triage Alerts', value: 'triageAlerts', action: 'List and optionally dismiss alerts with context' },
     { name: 'Health Snapshot', value: 'healthSnapshot', action: 'Summarise devices, interfaces, alerts, ASM' },
-    { name: 'Search Entities', value: 'searchEntities', action: 'Search devices/components/interfaces' },
   ],
   default: 'triageAlerts',
 };
@@ -23,7 +22,7 @@ export const playbookFields: INodeProperties[] = [
     type: 'multiOptions',
     typeOptions: { loadOptionsMethod: 'getTenants' },
     default: [],
-    displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts', 'healthSnapshot', 'searchEntities'] } },
+    displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts', 'healthSnapshot'] } },
   },
 
   // Triage Alerts options
@@ -46,14 +45,14 @@ export const playbookFields: INodeProperties[] = [
     name: 'detectedTimePreset',
     type: 'options',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    default: 'LAST_7_DAYS',
+    default: 'LAST_30_MINUTES',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'] } },
   },
   {
     displayName: 'Detected After',
     name: 'filterDetectedTimeAfter',
     type: 'string',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
     default: '',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], detectedTimePreset: ['CUSTOM'] } },
   },
@@ -61,7 +60,7 @@ export const playbookFields: INodeProperties[] = [
     displayName: 'Detected Before',
     name: 'filterDetectedTimeBefore',
     type: 'string',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
     default: '',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], detectedTimePreset: ['CUSTOM'] } },
   },
@@ -80,12 +79,20 @@ export const playbookFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'] } },
   },
   {
-    displayName: 'Utilisation Window (hours)',
+    displayName: 'Utilisation Preset',
+    name: 'utilisationPreset',
+    type: 'options',
+    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
+    default: 'LAST_1_HOUR',
+    displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], includeUtilisation: [true] } },
+  },
+  {
+    displayName: 'Utilisation Window',
     name: 'utilisationWindowHours',
     type: 'number',
     typeOptions: { minValue: 1, maxValue: 168 },
     default: 24,
-    displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], includeUtilisation: [true] } },
+    displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], includeUtilisation: [true], utilisationPreset: ['CUSTOM'] } },
   },
   {
     displayName: 'Bulk Dismiss',
@@ -144,7 +151,7 @@ export const playbookFields: INodeProperties[] = [
     displayName: 'From Time',
     name: 'snapshotFrom',
     type: 'string',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
     default: '',
     displayOptions: { show: { resource: ['playbook'], operation: ['healthSnapshot'], snapshotPreset: ['CUSTOM'] } },
   },
@@ -152,7 +159,7 @@ export const playbookFields: INodeProperties[] = [
     displayName: 'To Time',
     name: 'snapshotTo',
     type: 'string',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
     default: '',
     displayOptions: { show: { resource: ['playbook'], operation: ['healthSnapshot'], snapshotPreset: ['CUSTOM'] } },
   },
@@ -165,36 +172,7 @@ export const playbookFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['playbook'], operation: ['healthSnapshot'] } },
   },
 
-  // Search Entities options
-  {
-    displayName: 'Query',
-    name: 'query',
-    type: 'string',
-    required: true,
-    default: '',
-    description: 'Text to match in names/addresses (client-side contains match)',
-    displayOptions: { show: { resource: ['playbook'], operation: ['searchEntities'] } },
-  },
-  {
-    displayName: 'Scope',
-    name: 'scope',
-    type: 'multiOptions',
-    options: [
-      { name: 'Devices', value: 'device' },
-      { name: 'Interfaces', value: 'interface' },
-      { name: 'Components', value: 'component' },
-    ],
-    default: ['device', 'interface', 'component'],
-    displayOptions: { show: { resource: ['playbook'], operation: ['searchEntities'] } },
-  },
-  {
-    displayName: 'Max Results',
-    name: 'maxResults',
-    type: 'number',
-    typeOptions: { minValue: 1, maxValue: 10000 },
-    default: 200,
-    displayOptions: { show: { resource: ['playbook'], operation: ['searchEntities'] } },
-  },
+
 
 ];
 

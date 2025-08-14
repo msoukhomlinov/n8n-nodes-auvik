@@ -46,31 +46,65 @@ export async function executeSnmp(this: IExecuteFunctions): Promise<INodeExecuti
   }
 
   if (operation === 'getHistoryString' || operation === 'getHistoryNumeric') {
-    const fromTime = this.getNodeParameter('fromTime', 0) as string;
-    const thruTime = this.getNodeParameter('thruTime', 0, '') as string;
+    const timePreset = this.getNodeParameter('timePreset', 0, 'LAST_24_HOURS') as string;
+    let fromTime = this.getNodeParameter('fromTime', 0, '') as string;
+    let thruTime = this.getNodeParameter('thruTime', 0, '') as string;
     const compact = this.getNodeParameter('compact', 0, false) as boolean;
     const tenantsSel = this.getNodeParameter('tenantsHistory', 0, []) as string[];
     const deviceId = this.getNodeParameter('deviceId', 0, '') as string;
     const settingIdsCsv = this.getNodeParameter('settingIdsCsv', 0, '') as string;
+    const interval = operation === 'getHistoryNumeric' ? (this.getNodeParameter('interval', 0, 'hour') as string) : '';
+    const debugRequest = this.getNodeParameter('debugRequest', 0, false) as boolean;
 
-    const qs: IDataObject = {
-      'filter[fromTime]': fromTime,
-    };
+    let forceCompact = false;
+    if (timePreset && timePreset !== 'CUSTOM') {
+      const { computeDateTimeRangeNoTzUtc, computeDateTimeRangeUtc } = await import('../../helpers/options/datePresets');
+      const noTz = computeDateTimeRangeNoTzUtc(timePreset as any);
+      fromTime = noTz.from;
+      thruTime = noTz.to;
+      // If range > 24h and user hasn't set compact, force compact=true to satisfy API limits
+      try {
+        const iso = computeDateTimeRangeUtc(timePreset as any);
+        const diffMs = new Date(iso.to).getTime() - new Date(iso.from).getTime();
+        if (!compact && diffMs > 24 * 60 * 60 * 1000) {
+          forceCompact = true;
+        }
+      } catch {}
+    }
+
+    const qs: IDataObject = {};
     if (fromTime) {
       const { assertDateTimeNoTz } = await import('../../helpers/validation');
       assertDateTimeNoTz.call(this, fromTime, 'filter[fromTime]');
+      qs['filter[fromTime]'] = fromTime;
     }
     if (thruTime) {
       const { assertDateTimeNoTz } = await import('../../helpers/validation');
       assertDateTimeNoTz.call(this, thruTime, 'filter[thruTime]');
+      qs['filter[thruTime]'] = thruTime;
     }
-    if (thruTime) qs['filter[thruTime]'] = thruTime;
-    if (compact) qs['filter[compact]'] = true;
+    if (compact || forceCompact) qs['filter[compact]'] = true;
     if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
     if (deviceId) qs['filter[deviceId]'] = deviceId;
     if (settingIdsCsv) qs['filter[snmpPollerSettingId]'] = settingIdsCsv;
+    if (operation === 'getHistoryNumeric' && interval) qs['filter[interval]'] = interval;
 
     const path = operation === 'getHistoryString' ? '/stat/snmppoller/string' : '/stat/snmppoller/int';
+    if (debugRequest) {
+      const debugPayload = {
+        path,
+        qs,
+        meta: {
+          operation,
+          timePreset,
+          compactRequested: compact,
+          interval: operation === 'getHistoryNumeric' ? interval : undefined,
+        },
+      } as IDataObject;
+      this.logger?.info?.(`[Auvik SNMP] Request: ${JSON.stringify(debugPayload)}`);
+      return [this.helpers.returnJsonArray([{ debug: debugPayload }])];
+    }
+
     const data = await getAllByCursor.call(this, { path, qs });
     for (const d of data) returnData.push(d as IDataObject);
   }

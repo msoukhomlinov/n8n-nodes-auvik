@@ -214,3 +214,14 @@ export function computeAfterDateUtc(preset: DateRangePreset): string {
 }
 
 
+// Non-ISO helpers for endpoints that expect no timezone and no milliseconds
+function isoToNoTz(iso: string): string {
+  // Convert 'YYYY-MM-DDTHH:mm:ss.SSSZ' → 'YYYY-MM-DD HH:mm:ss'
+  return iso.slice(0, 19).replace('T', ' ');
+}
+
+export function computeDateTimeRangeNoTzUtc(preset: DateRangePreset): { from: string; to: string } {
+  const { from, to } = computeDateTimeRangeUtc(preset);
+  return { from: isoToNoTz(from), to: isoToNoTz(to) };
+}
+

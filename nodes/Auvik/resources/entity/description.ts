@@ -24,7 +24,7 @@ export const entityFields: INodeProperties[] = [
   { displayName: 'User', name: 'filterUser', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
   { displayName: 'Category', name: 'filterCategory', type: 'options', options: [{ name: 'Unknown', value: 'unknown' }, { name: 'Tunnel', value: 'tunnel' }, { name: 'Terminal', value: 'terminal' }, { name: 'Remote Browser', value: 'remoteBrowser' }], default: 'unknown', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
   { displayName: 'Status', name: 'filterStatus', type: 'options', options: [{ name: 'Unknown', value: 'unknown' }, { name: 'Initiated', value: 'initiated' }, { name: 'Created', value: 'created' }, { name: 'Closed', value: 'closed' }, { name: 'Failed', value: 'failed' }], default: 'created', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
-  { displayName: 'Modified After', name: 'filterModifiedAfter', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
+  { displayName: 'Modified After', name: 'filterModifiedAfter', type: 'string', default: '', placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', description: 'Lower bound of modified time (ISO 8601 UTC)', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
   { displayName: 'Tenants', name: 'tenants', type: 'multiOptions', typeOptions: { loadOptionsMethod: 'getTenants' }, default: [], displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
 
   // Notes filters
@@ -32,7 +32,7 @@ export const entityFields: INodeProperties[] = [
   { displayName: 'Entity Type', name: 'filterEntityType', type: 'options', options: [{ name: 'Root', value: 'root' }, { name: 'Device', value: 'device' }, { name: 'Network', value: 'network' }, { name: 'Interface', value: 'interface' }], default: 'device', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   { displayName: 'Entity Name', name: 'filterEntityName', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   { displayName: 'Last Modified By', name: 'filterLastModifiedBy', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
-  { displayName: 'Modified After', name: 'filterNotesModifiedAfter', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
+  { displayName: 'Modified After', name: 'filterNotesModifiedAfter', type: 'string', default: '', placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', description: 'Lower bound of modified time (ISO 8601 UTC)', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   { displayName: 'Tenants', name: 'tenantsNotes', type: 'multiOptions', typeOptions: { loadOptionsMethod: 'getTenants' }, default: [], displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
 
   // Single IDs

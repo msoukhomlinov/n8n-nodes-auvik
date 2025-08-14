@@ -17,11 +17,12 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
   if (operation === 'triageAlerts') {
     const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
     const severity = this.getNodeParameter('severity', 0, '') as string;
-    const detectedTimePreset = this.getNodeParameter('detectedTimePreset', 0, 'LAST_7_DAYS') as string;
+    const detectedTimePreset = this.getNodeParameter('detectedTimePreset', 0, 'LAST_30_MINUTES') as string;
     let filterDetectedTimeAfter = this.getNodeParameter('filterDetectedTimeAfter', 0, '') as string;
     let filterDetectedTimeBefore = this.getNodeParameter('filterDetectedTimeBefore', 0, '') as string;
     const includeUtilisation = this.getNodeParameter('includeUtilisation', 0, true) as boolean;
     const includeLastConfig = this.getNodeParameter('includeLastConfig', 0, true) as boolean;
+    const utilisationPreset = this.getNodeParameter('utilisationPreset', 0, 'LAST_1_HOUR') as string;
     const utilisationWindowHours = this.getNodeParameter('utilisationWindowHours', 0, 24) as number;
     const bulkDismiss = this.getNodeParameter('bulkDismiss', 0, false) as boolean;
     const confirmBulkDismiss = this.getNodeParameter('confirmBulkDismiss', 0, false) as boolean;
@@ -61,8 +62,16 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       // Optional recent utilisation via Statistics (bandwidth)
       let utilisationSummary: IDataObject | undefined;
       if (includeUtilisation && entityType === 'device' && entityId) {
-        const toIso = new Date().toISOString();
-        const fromIso = new Date(Date.now() - utilisationWindowHours * 60 * 60 * 1000).toISOString();
+        let fromIso: string | undefined;
+        let toIso: string | undefined;
+        if (utilisationPreset && utilisationPreset !== 'CUSTOM') {
+          const range = isoRangeFromPreset(utilisationPreset);
+          fromIso = range.from;
+          toIso = range.to;
+        } else {
+          toIso = new Date().toISOString();
+          fromIso = new Date(Date.now() - utilisationWindowHours * 60 * 60 * 1000).toISOString();
+        }
         const stats = await requestAuvik.call(this, {
           method: 'GET',
           path: '/stat/device/bandwidth',
@@ -299,57 +308,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     return [this.helpers.returnJsonArray([snapshot])];
   }
 
-  // 3) Search Entities
-  if (operation === 'searchEntities') {
-    const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
-    const query = (this.getNodeParameter('query', 0) as string) || '';
-    const scope = (this.getNodeParameter('scope', 0, ['device', 'interface', 'component']) as string[]) || [];
-    const maxResults = this.getNodeParameter('maxResults', 0, 200) as number;
-    const tenantsCsv = Array.isArray(tenantsSel) && tenantsSel.length ? tenantsSel.join(',') : undefined;
 
-    const results: IDataObject[] = [];
-
-    if (scope.includes('device')) {
-      const devices = await getAllByCursor.call(this, { path: '/inventory/device/info', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
-      for (const d of devices as IDataObject[]) {
-        const attrs: any = (d as any)?.attributes || {};
-        const hay = [attrs.displayName, attrs.name, attrs.hostname, attrs.hostName, attrs.primaryIp, attrs.ipAddress, attrs.fqdn]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-        if (!query || hay.includes(query.toLowerCase())) results.push({ type: 'device', ...d });
-        if (results.length >= maxResults) return [this.helpers.returnJsonArray(results)];
-      }
-    }
-
-    if (scope.includes('interface')) {
-      const interfaces = await getAllByCursor.call(this, { path: '/inventory/interface/info', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
-      for (const i of interfaces as IDataObject[]) {
-        const attrs: any = (i as any)?.attributes || {};
-        const hay = [attrs.displayName, attrs.name, attrs.ipAddress]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-        if (!query || hay.includes(query.toLowerCase())) results.push({ type: 'interface', ...i });
-        if (results.length >= maxResults) return [this.helpers.returnJsonArray(results)];
-      }
-    }
-
-    if (scope.includes('component')) {
-      const components = await getAllByCursor.call(this, { path: '/inventory/component/info', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
-      for (const c of components as IDataObject[]) {
-        const attrs: any = (c as any)?.attributes || {};
-        const hay = [attrs.displayName, attrs.name, attrs.componentType]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-        if (!query || hay.includes(query.toLowerCase())) results.push({ type: 'component', ...c });
-        if (results.length >= maxResults) return [this.helpers.returnJsonArray(results)];
-      }
-    }
-
-    return [this.helpers.returnJsonArray(results)];
-  }
 
 
 

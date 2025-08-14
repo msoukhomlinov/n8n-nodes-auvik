@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { dateTimePresetOptions } from '../../helpers/options/datePresets';
 
 export const snmpOperations: INodeProperties = {
   displayName: 'Operation',
@@ -32,12 +33,15 @@ export const snmpFields: INodeProperties[] = [
   { displayName: 'Setting ID', name: 'snmpPollerSettingId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSetting', 'getSettingDevices'] } } },
 
   // History common
-  { displayName: 'From Time', name: 'fromTime', type: 'string', required: true, default: '', placeholder: 'YYYY-MM-DD HH:mm:ss', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
-  { displayName: 'Thru Time', name: 'thruTime', type: 'string', default: '', placeholder: 'YYYY-MM-DD HH:mm:ss', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
+  { displayName: 'Time Preset', name: 'timePreset', type: 'options', default: 'LAST_24_HOURS', options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }], displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
+  { displayName: 'From Time', name: 'fromTime', type: 'string', required: true, default: '', placeholder: 'YYYY-MM-DD HH:mm:ss', description: 'Lower bound (no timezone)', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'], timePreset: ['CUSTOM'] } } },
+  { displayName: 'Thru Time', name: 'thruTime', type: 'string', default: '', placeholder: 'YYYY-MM-DD HH:mm:ss', description: 'Upper bound (no timezone)', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'], timePreset: ['CUSTOM'] } } },
+  { displayName: 'Interval', name: 'interval', type: 'options', options: [ { name: 'Minute', value: 'minute' }, { name: 'Hour', value: 'hour' }, { name: 'Day', value: 'day' } ], default: 'hour', required: true, description: 'Statistics reporting interval', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryNumeric'] } } },
   { displayName: 'Compact', name: 'compact', type: 'boolean', default: false, displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
   { displayName: 'Tenants', name: 'tenantsHistory', type: 'multiOptions', typeOptions: { loadOptionsMethod: 'getTenants' }, required: true, default: [], displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
   { displayName: 'Device ID', name: 'deviceId', type: 'string', default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
   { displayName: 'SNMP Poller Setting IDs (CSV)', name: 'settingIdsCsv', type: 'string', default: '', description: 'Internal snmpPollerSettingId list (CSV)', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
+  { displayName: 'Debug Request', name: 'debugRequest', type: 'boolean', default: false, description: 'Include debug info and log the built request', displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },
 ];
 
 

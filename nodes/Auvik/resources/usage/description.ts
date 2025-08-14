@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { dateTimePresetOptions } from '../../helpers/options/datePresets';
 
 export const usageOperations: INodeProperties = {
   displayName: 'Operation',
@@ -32,22 +33,7 @@ export const usageFields: INodeProperties[] = [
     name: 'datePreset',
     type: 'options',
     default: 'LAST_30_DAYS',
-    options: [
-      { name: 'Today', value: 'TODAY' },
-      { name: 'Yesterday', value: 'YESTERDAY' },
-      { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
-      { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
-      { name: 'Last 7 days', value: 'LAST_7_DAYS' },
-      { name: 'Last 14 days', value: 'LAST_14_DAYS' },
-      { name: 'Last 30 days', value: 'LAST_30_DAYS' },
-      { name: 'Last 90 days', value: 'LAST_90_DAYS' },
-      { name: 'This week', value: 'THIS_WEEK' },
-      { name: 'This month', value: 'THIS_MONTH' },
-      { name: 'Last month', value: 'LAST_MONTH' },
-      { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
-      { name: 'Year to date', value: 'YEAR_TO_DATE' },
-      { name: 'Custom', value: 'CUSTOM' },
-    ],
+    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     description: 'Quickly select a date range. Choose Custom to enter specific dates.',
     displayOptions: {
       show: {

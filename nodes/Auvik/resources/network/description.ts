@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { dateTimePresetOptions } from '../../helpers/options/datePresets';
 
 export const networkOperations: INodeProperties = {
   displayName: 'Operation',
@@ -128,22 +129,7 @@ export const networkFields: INodeProperties[] = [
     name: 'modifiedAfterPreset',
     type: 'options',
     default: 'CUSTOM',
-    options: [
-      { name: 'Today', value: 'TODAY' },
-      { name: 'Yesterday', value: 'YESTERDAY' },
-      { name: 'Last 24 hours', value: 'LAST_24_HOURS' },
-      { name: 'Last 48 hours', value: 'LAST_48_HOURS' },
-      { name: 'Last 7 days', value: 'LAST_7_DAYS' },
-      { name: 'Last 14 days', value: 'LAST_14_DAYS' },
-      { name: 'Last 30 days', value: 'LAST_30_DAYS' },
-      { name: 'Last 90 days', value: 'LAST_90_DAYS' },
-      { name: 'This week', value: 'THIS_WEEK' },
-      { name: 'This month', value: 'THIS_MONTH' },
-      { name: 'Last month', value: 'LAST_MONTH' },
-      { name: 'Quarter to date', value: 'QUARTER_TO_DATE' },
-      { name: 'Year to date', value: 'YEAR_TO_DATE' },
-      { name: 'Custom', value: 'CUSTOM' },
-    ],
+    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     displayOptions: { show: { resource: ['network'], operation: ['getMany'] } },
   },
   {
@@ -152,6 +138,7 @@ export const networkFields: INodeProperties[] = [
     type: 'string',
     default: '',
     placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
+    description: 'Lower bound of modified time (ISO 8601 UTC)',
     displayOptions: {
       show: {
         resource: ['network'],
