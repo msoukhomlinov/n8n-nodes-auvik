@@ -46,6 +46,25 @@ export async function executeNetwork(this: IExecuteFunctions): Promise<INodeExec
 
     const data = await getAllByCursor.call(this, {
       path: '/inventory/network/info',
+      apiVersion: 'v1',
+      qs,
+    });
+    const sliced = returnAll ? data : data.slice(0, limit);
+    for (const d of sliced) returnData.push(d as IDataObject);
+  }
+
+  if (operation === 'getManyDetail') {
+    const returnAll = this.getNodeParameter('returnAll', 0, true) as boolean;
+    const limit = this.getNodeParameter('limit', 0, 100) as number;
+
+    // Reuse existing query builder, then add detail-specific filters
+    const qs = buildNetworkQuery.call(this);
+    const filterScope = this.getNodeParameter('filterScope', 0, '') as string;
+    if (filterScope) qs['filter[scope]'] = filterScope;
+
+    const data = await getAllByCursor.call(this, {
+      path: '/inventory/network/detail',
+      apiVersion: 'v1',
       qs,
     });
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -65,7 +84,20 @@ export async function executeNetwork(this: IExecuteFunctions): Promise<INodeExec
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/inventory/network/info/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
       qs,
+    });
+    const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
+    for (const d of data) returnData.push(d as IDataObject);
+  }
+
+  if (operation === 'getOneDetail') {
+    const id = this.getNodeParameter('id', 0) as string;
+
+    const resp = await requestAuvik.call(this, {
+      method: 'GET',
+      path: `/inventory/network/detail/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);

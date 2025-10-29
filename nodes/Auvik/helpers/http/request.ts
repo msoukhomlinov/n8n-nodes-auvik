@@ -1,12 +1,13 @@
 import type { IDataObject, IExecuteFunctions, ILoadOptionsFunctions, JsonObject } from 'n8n-workflow';
-import { NodeApiError } from 'n8n-workflow';
-import { resolveBaseUrl } from '../../constants/index';
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+import { resolveBaseUrl, buildVersionedPath } from '../../constants/index';
 
 type Context = IExecuteFunctions | ILoadOptionsFunctions;
 
 export interface AuvikRequestOptions {
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   path: string; // e.g. '/tenants'
+  apiVersion: 'v1' | 'v2';
   qs?: IDataObject;
   body?: IDataObject;
   headers?: IDataObject;
@@ -29,9 +30,13 @@ export async function requestAuvik(this: Context, opts: AuvikRequestOptions): Pr
   const computedBaseUrl = (credentials.computedBaseUrl as string) || undefined;
   const baseURL = computedBaseUrl || resolveBaseUrl(region, customBaseUrl);
 
+  if (!opts.apiVersion) {
+    throw new NodeOperationError(this.getNode(), 'apiVersion is required');
+  }
+
   const requestOptions: any = {
     method: opts.method,
-    uri: `${baseURL}${opts.path}`,
+    uri: `${baseURL}${buildVersionedPath(opts.path, opts.apiVersion)}`,
     qs: opts.qs,
     body: opts.body,
     json: true,

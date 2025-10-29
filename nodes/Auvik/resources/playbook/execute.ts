@@ -41,7 +41,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     if (filterDetectedTimeAfter) qs['filter[detectedTimeAfter]'] = filterDetectedTimeAfter;
     if (filterDetectedTimeBefore) qs['filter[detectedTimeBefore]'] = filterDetectedTimeBefore;
 
-    const alerts = await getAllByCursor.call(this, { path: '/alert/history/info', qs });
+    const alerts = await getAllByCursor.call(this, { path: '/alert/history/info', apiVersion: 'v1', qs });
     const sliced = returnAll ? alerts : alerts.slice(0, limit);
 
     const enriched: IDataObject[] = [];
@@ -55,7 +55,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
 
       let deviceInfo: IDataObject | undefined;
       if (entityType === 'device' && entityId) {
-        const resp = await requestAuvik.call(this, { method: 'GET', path: `/inventory/device/info/${encodeURIComponent(entityId)}` });
+        const resp = await requestAuvik.call(this, { method: 'GET', path: `/inventory/device/info/${encodeURIComponent(entityId)}`, apiVersion: 'v1' });
         deviceInfo = Array.isArray(resp?.data) ? (resp.data[0] as IDataObject) : (resp?.data as IDataObject);
       }
 
@@ -75,6 +75,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
         const stats = await requestAuvik.call(this, {
           method: 'GET',
           path: '/stat/device/bandwidth',
+          apiVersion: 'v1',
           qs: { 'filter[fromTime]': fromIso, 'filter[thruTime]': toIso, 'filter[interval]': 'hour', 'filter[deviceId]': entityId, tenants: qs.tenants },
         });
         utilisationSummary = stats?.data as IDataObject;
@@ -82,7 +83,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       // Optional last configuration reference (no content diff via API)
       let lastConfiguration: IDataObject | undefined;
       if (includeLastConfig && entityType === 'device' && entityId) {
-        const configs = await getAllByCursor.call(this, { path: '/inventory/configuration', qs: { 'filter[deviceId]': entityId, tenants: qs.tenants, 'page[first]': 1 } });
+        const configs = await getAllByCursor.call(this, { path: '/inventory/configuration', apiVersion: 'v1', qs: { 'filter[deviceId]': entityId, tenants: qs.tenants, 'page[first]': 1 } });
         if (Array.isArray(configs) && configs.length) lastConfiguration = configs[0] as IDataObject;
       }
 
@@ -190,7 +191,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       for (const a of sliced as IDataObject[]) {
         const id = (a as any)?.id as string;
         if (!id) continue;
-        await requestAuvik.call(this, { method: 'POST', path: `/alert/dismiss/${encodeURIComponent(id)}` });
+        await requestAuvik.call(this, { method: 'POST', path: `/alert/dismiss/${encodeURIComponent(id)}`, apiVersion: 'v1' });
       }
     }
 
@@ -213,20 +214,19 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       snapshotTo = range.to || snapshotTo;
     }
 
-    const devices = await getAllByCursor.call(this, { path: '/inventory/device/info', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
-    const interfaces = await getAllByCursor.call(this, { path: '/inventory/interface/info', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
+    const devices = await getAllByCursor.call(this, { path: '/inventory/device/info', apiVersion: 'v1', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
+    const interfaces = await getAllByCursor.call(this, { path: '/inventory/interface/info', apiVersion: 'v1', qs: tenantsCsv ? { tenants: tenantsCsv } : {} });
 
     const alertQs: IDataObject = {};
     if (tenantsCsv) alertQs.tenants = tenantsCsv;
-    if (severityThreshold) alertQs['filter[severity]'] = severityThreshold;
     if (snapshotFrom) alertQs['filter[detectedTimeAfter]'] = snapshotFrom;
     if (snapshotTo) alertQs['filter[detectedTimeBefore]'] = snapshotTo;
-    const alerts = await getAllByCursor.call(this, { path: '/alert/history/info', qs: alertQs });
+    const alerts = await getAllByCursor.call(this, { path: '/alert/history/info', apiVersion: 'v1', qs: alertQs });
 
     // ASM elements are optional; only fetch if ASM endpoints are exposed
     let asmClients: IDataObject[] = [];
     try {
-      asmClients = (await getAllByCursor.call(this, { path: '/asm/client/info', qs: {} })) as IDataObject[];
+      asmClients = (await getAllByCursor.call(this, { path: '/asm/client/info', apiVersion: 'v1', qs: {} })) as IDataObject[];
     } catch {
       asmClients = [];
     }
@@ -235,6 +235,15 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     const devicesArr = (Array.isArray(devices) ? devices : []) as IDataObject[];
     const interfacesArr = (Array.isArray(interfaces) ? interfaces : []) as IDataObject[];
     const alertsArr = (Array.isArray(alerts) ? alerts : []) as IDataObject[];
+
+    const severityRank: Record<string, number> = { unknown: 0, info: 1, warning: 2, critical: 3, emergency: 4 };
+    const thresholdRank = severityThreshold ? severityRank[String(severityThreshold).toLowerCase()] ?? 0 : 0;
+    const filteredAlertsArr = thresholdRank > 0
+      ? alertsArr.filter((al) => {
+          const sev = String(((al as any)?.attributes || {}).severity || 'unknown').toLowerCase();
+          return (severityRank[sev] ?? 0) >= thresholdRank;
+        })
+      : alertsArr;
     const asmArr = (Array.isArray(asmClients) ? asmClients : []) as IDataObject[];
 
     // Devices summary
@@ -263,13 +272,13 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     // Alerts summary
     const alertsBySeverity: Record<string, number> = {};
     let dismissedCount = 0;
-    for (const al of alertsArr) {
+    for (const al of filteredAlertsArr) {
       const a: any = (al as any)?.attributes || {};
       const sev = String(a.severity || 'unknown').toLowerCase();
       alertsBySeverity[sev] = (alertsBySeverity[sev] || 0) + 1;
       if (a.dismissed === true) dismissedCount += 1;
     }
-    const activeCount = alertsArr.length - dismissedCount;
+    const activeCount = filteredAlertsArr.length - dismissedCount;
 
     const snapshot: IDataObject = {
       context: {
@@ -280,14 +289,14 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       counts: {
         devices: devicesArr.length,
         interfaces: interfacesArr.length,
-        alerts: alertsArr.length,
+        alerts: filteredAlertsArr.length,
         asmClients: asmArr.length,
       },
       alerts: {
         bySeverity: alertsBySeverity,
         active: activeCount,
         dismissed: dismissedCount,
-        ...(includeLists ? { list: alertsArr } : {}),
+        ...(includeLists ? { list: filteredAlertsArr } : {}),
       },
       devices: {
         byOnlineStatus: deviceOnlineStatus,

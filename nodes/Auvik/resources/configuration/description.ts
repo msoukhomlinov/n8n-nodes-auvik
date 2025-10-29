@@ -42,7 +42,18 @@ export const configurationFields: INodeProperties[] = [
   { displayName: 'Backup Time Preset', name: 'backupTimePreset', type: 'options', default: 'LAST_30_DAYS', options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }], displayOptions: { show: { resource: ['configuration'], operation: ['getMany'] } } },
   { displayName: 'Backup Time After', name: 'filterBackupTimeAfter', type: 'string', default: '', description: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', displayOptions: { show: { resource: ['configuration'], operation: ['getMany'], backupTimePreset: ['CUSTOM'] } } },
   { displayName: 'Backup Time Before', name: 'filterBackupTimeBefore', type: 'string', default: '', description: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]', displayOptions: { show: { resource: ['configuration'], operation: ['getMany'], backupTimePreset: ['CUSTOM'] } } },
-  { displayName: 'Is Running', name: 'filterIsRunning', type: 'boolean', default: false, displayOptions: { show: { resource: ['configuration'], operation: ['getMany'] } } },
+  {
+    displayName: 'Running State',
+    name: 'runningState',
+    type: 'options',
+    default: 'ALL',
+    options: [
+      { name: 'All', value: 'ALL' },
+      { name: 'Running Only', value: 'RUNNING' },
+      { name: 'Not Running Only', value: 'NOT_RUNNING' },
+    ],
+    displayOptions: { show: { resource: ['configuration'], operation: ['getMany'] } },
+  },
   { displayName: 'Configuration ID', name: 'id', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['configuration'], operation: ['getOne'] } } },
 ];
 

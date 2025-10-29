@@ -14,7 +14,7 @@ function buildConfigurationQuery(this: IExecuteFunctions): IDataObject {
     filterBackupTimeAfter = range.from;
     filterBackupTimeBefore = range.to;
   }
-  const filterIsRunning = this.getNodeParameter('filterIsRunning', 0, false) as boolean;
+  const runningState = this.getNodeParameter('runningState', 0, 'ALL') as string;
   const qs: IDataObject = {};
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterDeviceId) qs['filter[deviceId]'] = filterDeviceId;
@@ -28,7 +28,8 @@ function buildConfigurationQuery(this: IExecuteFunctions): IDataObject {
     assertIsoDateTime.call(this, filterBackupTimeBefore, 'filter[backupTimeBefore]');
     qs['filter[backupTimeBefore]'] = filterBackupTimeBefore;
   }
-  if (filterIsRunning) qs['filter[isRunning]'] = true;
+  if (runningState === 'RUNNING') qs['filter[isRunning]'] = true;
+  if (runningState === 'NOT_RUNNING') qs['filter[isRunning]'] = false;
   return qs;
 }
 
@@ -40,14 +41,14 @@ export async function executeConfiguration(this: IExecuteFunctions): Promise<INo
     const returnAll = this.getNodeParameter('returnAll', 0) as boolean;
     const limit = this.getNodeParameter('limit', 0, 100) as number;
     const qs = buildConfigurationQuery.call(this);
-    const data = await getAllByCursor.call(this, { path: '/inventory/configuration', qs });
+    const data = await getAllByCursor.call(this, { path: '/inventory/configuration', apiVersion: 'v1', qs });
     const sliced = returnAll ? data : data.slice(0, limit);
     for (const d of sliced) returnData.push(d as IDataObject);
   }
 
   if (operation === 'getOne') {
     const id = this.getNodeParameter('id', 0) as string;
-    const resp = await requestAuvik.call(this, { method: 'GET', path: `/inventory/configuration/${encodeURIComponent(id)}` });
+    const resp = await requestAuvik.call(this, { method: 'GET', path: `/inventory/configuration/${encodeURIComponent(id)}`, apiVersion: 'v1' });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);
   }

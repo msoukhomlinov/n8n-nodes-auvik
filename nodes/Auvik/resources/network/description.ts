@@ -18,9 +18,19 @@ export const networkOperations: INodeProperties = {
       action: 'Get many networks info',
     },
     {
+      name: 'Get Many Detail',
+      value: 'getManyDetail',
+      action: 'Get many networks detail',
+    },
+    {
       name: 'Get One',
       value: 'getOne',
       action: 'Get one network info',
+    },
+    {
+      name: 'Get One Detail',
+      value: 'getOneDetail',
+      action: 'Get one network detail',
     },
   ],
   default: 'getMany',
@@ -65,7 +75,7 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getMany'],
+        operation: ['getMany', 'getManyDetail'],
       },
     },
   },
@@ -87,7 +97,7 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getMany'],
+        operation: ['getMany', 'getManyDetail'],
       },
     },
   },
@@ -106,7 +116,7 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getMany'],
+        operation: ['getMany', 'getManyDetail'],
       },
     },
   },
@@ -120,7 +130,7 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getMany'],
+        operation: ['getMany', 'getManyDetail'],
       },
     },
   },
@@ -130,7 +140,7 @@ export const networkFields: INodeProperties[] = [
     type: 'options',
     default: 'CUSTOM',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    displayOptions: { show: { resource: ['network'], operation: ['getMany'] } },
+    displayOptions: { show: { resource: ['network'], operation: ['getMany', 'getManyDetail'] } },
   },
   {
     displayName: 'Modified After',
@@ -142,8 +152,26 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getMany'],
+        operation: ['getMany', 'getManyDetail'],
         modifiedAfterPreset: ['CUSTOM'],
+      },
+    },
+  },
+  {
+    displayName: 'Scope',
+    name: 'filterScope',
+    type: 'options',
+    options: [
+      { name: 'Any', value: '' },
+      { name: 'Private', value: 'private' },
+      { name: 'Public', value: 'public' },
+    ],
+    default: '',
+    description: "Filter network's scope (detail endpoint only)",
+    displayOptions: {
+      show: {
+        resource: ['network'],
+        operation: ['getManyDetail'],
       },
     },
   },
@@ -189,7 +217,7 @@ export const networkFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['network'],
-        operation: ['getOne'],
+        operation: ['getOne', 'getOneDetail'],
       },
     },
   },

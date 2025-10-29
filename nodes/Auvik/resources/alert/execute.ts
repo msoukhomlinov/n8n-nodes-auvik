@@ -9,6 +9,7 @@ export async function executeAlert(this: IExecuteFunctions): Promise<INodeExecut
     const resp = await requestAuvik.call(this, {
       method: 'POST',
       path: `/alert/dismiss/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
     });
     const data: IDataObject = { success: true, id, response: resp };
     return [this.helpers.returnJsonArray([data])];

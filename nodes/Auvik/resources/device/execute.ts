@@ -5,9 +5,11 @@ import { requestAuvik } from '../../helpers/http/request';
 function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterDeviceType = this.getNodeParameter('filterDeviceType', 0, '') as string;
+  const filterNetworks = this.getNodeParameter('filterNetworks', 0, []) as string[];
   const filterVendorName = this.getNodeParameter('filterVendorName', 0, '') as string;
   const filterMakeModel = this.getNodeParameter('filterMakeModel', 0, '') as string;
   const filterOnlineStatus = this.getNodeParameter('filterOnlineStatus', 0, '') as string;
+  const filterTrafficInsightsStatus = this.getNodeParameter('filterTrafficInsightsStatus', 0, '') as string;
   const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
   let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
   const notSeenSincePreset = this.getNodeParameter('notSeenSincePreset', 0, 'LAST_7_DAYS') as string;
@@ -19,9 +21,11 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   const qs: IDataObject = {};
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterDeviceType) qs['filter[deviceType]'] = filterDeviceType;
+  if (Array.isArray(filterNetworks) && filterNetworks.length) qs['filter[networks]'] = filterNetworks.join(',');
   if (filterVendorName) qs['filter[vendorName]'] = filterVendorName;
   if (filterMakeModel) qs['filter[makeModel]'] = filterMakeModel;
   if (filterOnlineStatus) qs['filter[onlineStatus]'] = filterOnlineStatus;
+  if (filterTrafficInsightsStatus) qs['filter[trafficInsightsStatus]'] = filterTrafficInsightsStatus;
   if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
@@ -61,6 +65,7 @@ export async function executeDevice(this: IExecuteFunctions): Promise<INodeExecu
     const qs = buildDeviceQuery.call(this);
     const data = await getAllByCursor.call(this, {
       path: '/inventory/device/info',
+      apiVersion: 'v1',
       qs,
     });
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -81,6 +86,7 @@ export async function executeDevice(this: IExecuteFunctions): Promise<INodeExecu
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/inventory/device/info/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
       qs,
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];

@@ -128,6 +128,19 @@ export const alertHistoryFields: INodeProperties[] = [
     },
   },
   {
+    displayName: 'Alert Definition ID',
+    name: 'filterAlertDefinitionId',
+    type: 'string',
+    default: '',
+    description: 'Filter by alert definition ID',
+    displayOptions: {
+      show: {
+        resource: ['alertHistory'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
     displayName: 'Dismissed',
     name: 'filterDismissed',
     type: 'boolean',

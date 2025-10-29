@@ -6,7 +6,7 @@ function buildInterfaceQuery(this: IExecuteFunctions): IDataObject {
   const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterInterfaceType = this.getNodeParameter('filterInterfaceType', 0, '') as string;
   const filterParentDevice = this.getNodeParameter('filterParentDevice', 0, '') as string;
-  const filterAdminStatus = this.getNodeParameter('filterAdminStatus', 0, false) as boolean;
+  const filterAdminStatus = this.getNodeParameter('filterAdminStatus', 0, '') as string;
   const filterOperationalStatus = this.getNodeParameter('filterOperationalStatus', 0, '') as string;
   const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
   let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
@@ -15,7 +15,9 @@ function buildInterfaceQuery(this: IExecuteFunctions): IDataObject {
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
   if (filterInterfaceType) qs['filter[interfaceType]'] = filterInterfaceType;
   if (filterParentDevice) qs['filter[parentDevice]'] = filterParentDevice;
-  if (filterAdminStatus) qs['filter[adminStatus]'] = true;
+  if (filterAdminStatus === 'true' || filterAdminStatus === 'false') {
+    qs['filter[adminStatus]'] = filterAdminStatus;
+  }
   if (filterOperationalStatus) qs['filter[operationalStatus]'] = filterOperationalStatus;
   if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
@@ -39,6 +41,7 @@ export async function executeInterface(this: IExecuteFunctions): Promise<INodeEx
     const qs = buildInterfaceQuery.call(this);
     const data = await getAllByCursor.call(this, {
       path: '/inventory/interface/info',
+      apiVersion: 'v1',
       qs,
     });
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -50,6 +53,7 @@ export async function executeInterface(this: IExecuteFunctions): Promise<INodeEx
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/inventory/interface/info/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);

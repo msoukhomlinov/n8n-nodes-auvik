@@ -213,6 +213,15 @@ export function computeAfterDateUtc(preset: DateRangePreset): string {
   return computeDateRangeUtc(preset).from;
 }
 
+// Helpers for single "before" fields where only an upper bound is supported
+export function computeBeforeDateTimeUtc(preset: DateRangePreset): string {
+  return computeDateTimeRangeUtc(preset).to;
+}
+
+export function computeBeforeDateUtc(preset: DateRangePreset): string {
+  return computeDateRangeUtc(preset).to;
+}
+
 
 // Non-ISO helpers for endpoints that expect no timezone and no milliseconds
 function isoToNoTz(iso: string): string {

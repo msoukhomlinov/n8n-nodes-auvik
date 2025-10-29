@@ -7,6 +7,7 @@ function buildAlertHistoryQuery(this: IExecuteFunctions): IDataObject {
   const filterSeverity = this.getNodeParameter('filterSeverity', 0, '') as string;
   const filterStatus = this.getNodeParameter('filterStatus', 0, '') as string;
   const filterEntityId = this.getNodeParameter('filterEntityId', 0, '') as string;
+  const filterAlertDefinitionId = this.getNodeParameter('filterAlertDefinitionId', 0, '') as string;
   const filterDismissed = this.getNodeParameter('filterDismissed', 0, false) as boolean;
   const filterDispatched = this.getNodeParameter('filterDispatched', 0, false) as boolean;
   const preset = this.getNodeParameter('detectedTimePreset', 0, 'LAST_7_DAYS') as string;
@@ -24,6 +25,7 @@ function buildAlertHistoryQuery(this: IExecuteFunctions): IDataObject {
   if (filterSeverity) qs['filter[severity]'] = filterSeverity;
   if (filterStatus) qs['filter[status]'] = filterStatus;
   if (filterEntityId) qs['filter[entityId]'] = filterEntityId;
+  if (filterAlertDefinitionId) qs['filter[alertDefinitionId]'] = filterAlertDefinitionId;
   if (filterDismissed) qs['filter[dismissed]'] = true;
   if (filterDispatched) qs['filter[dispatched]'] = true;
   if (filterDetectedTimeAfter) {
@@ -50,6 +52,7 @@ export async function executeAlertHistory(this: IExecuteFunctions): Promise<INod
     const qs = buildAlertHistoryQuery.call(this);
     const data = await getAllByCursor.call(this, {
       path: '/alert/history/info',
+      apiVersion: 'v1',
       qs,
     });
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -61,6 +64,7 @@ export async function executeAlertHistory(this: IExecuteFunctions): Promise<INod
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/alert/history/info/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);

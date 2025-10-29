@@ -5,6 +5,7 @@ type Context = IExecuteFunctions | ILoadOptionsFunctions;
 
 export interface CursorPageParams {
   path: string;
+  apiVersion: 'v1' | 'v2';
   qs?: IDataObject;
   include?: string;
   fields?: Record<string, string>;
@@ -21,7 +22,7 @@ export async function getAllByCursor(this: Context, params: CursorPageParams): P
       qs[`fields[${resource}]`] = fieldsCsv;
     }
   }
-  const pageFirst = params.pageSize ?? 100;
+  const pageFirst = params.pageSize ?? (params.apiVersion === 'v2' ? 1000 : 100);
 
   let cursorAfter: string | undefined;
 
@@ -33,6 +34,7 @@ export async function getAllByCursor(this: Context, params: CursorPageParams): P
     const response = await requestAuvik.call(this, {
       method: 'GET',
       path: params.path,
+      apiVersion: params.apiVersion,
       qs: { ...qs, ...page },
     });
 

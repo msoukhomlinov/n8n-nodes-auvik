@@ -31,6 +31,45 @@ export const snmpFields: INodeProperties[] = [
 
   // Single setting and devices
   { displayName: 'Setting ID', name: 'snmpPollerSettingId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSetting', 'getSettingDevices'] } } },
+  { displayName: 'Tenants', name: 'tenantsDevices', type: 'multiOptions', typeOptions: { loadOptionsMethod: 'getTenants' }, required: true, default: [], displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
+  { displayName: 'Online Status', name: 'filterOnlineStatus', type: 'options', options: [
+    { name: 'Online', value: 'online' },
+    { name: 'Offline', value: 'offline' },
+    { name: 'Unreachable', value: 'unreachable' },
+    { name: 'Testing', value: 'testing' },
+    { name: 'Unknown', value: 'unknown' },
+    { name: 'Dormant', value: 'dormant' },
+    { name: 'Not Present', value: 'notPresent' },
+    { name: 'Lower Layer Down', value: 'lowerLayerDown' },
+  ], default: 'online', displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
+  {
+    displayName: 'Modified After Preset',
+    name: 'modifiedAfterPreset',
+    type: 'options',
+    default: 'LAST_7_DAYS',
+    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
+    description: 'Quickly set the lower bound for modified time; choose Custom to enter a datetime',
+    displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } },
+  },
+  {
+    displayName: 'Modified After',
+    name: 'filterModifiedAfter',
+    type: 'string',
+    default: '',
+    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
+    description: 'Lower bound of modified time (ISO 8601 UTC)',
+    displayOptions: {
+      show: {
+        resource: ['snmp'],
+        operation: ['getSettingDevices'],
+        modifiedAfterPreset: ['CUSTOM'],
+      },
+    },
+  },
+  { displayName: 'Not Seen Since (ISO 8601 Z)', name: 'filterNotSeenSince', type: 'string', default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
+  { displayName: 'Device Type', name: 'filterDeviceTypeDevices', type: 'string', default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
+  { displayName: 'Make Model', name: 'filterMakeModelDevices', type: 'string', default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
+  { displayName: 'Vendor Name', name: 'filterVendorNameDevices', type: 'string', default: '', displayOptions: { show: { resource: ['snmp'], operation: ['getSettingDevices'] } } },
 
   // History common
   { displayName: 'Time Preset', name: 'timePreset', type: 'options', default: 'LAST_24_HOURS', options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }], displayOptions: { show: { resource: ['snmp'], operation: ['getHistoryString', 'getHistoryNumeric'] } } },

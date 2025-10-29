@@ -25,15 +25,15 @@ export async function executeUsage(this: IExecuteFunctions): Promise<INodeExecut
 
   if (operation === 'getClient') {
     const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
-    const qs: IDataObject = {
-      'filter[fromDate]': fromDate,
-      'filter[thruDate]': thruDate,
-    };
+    const qs: IDataObject = {};
+    if (fromDate) qs['filter[fromDate]'] = fromDate;
+    if (thruDate) qs['filter[thruDate]'] = thruDate;
     if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
 
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: '/billing/usage/client',
+      apiVersion: 'v1',
       qs,
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
@@ -42,13 +42,15 @@ export async function executeUsage(this: IExecuteFunctions): Promise<INodeExecut
 
   if (operation === 'getDevice') {
     const id = this.getNodeParameter('id', 0) as string;
+    const qs: IDataObject = {};
+    if (fromDate) qs['filter[fromDate]'] = fromDate;
+    if (thruDate) qs['filter[thruDate]'] = thruDate;
+
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/billing/usage/device/${encodeURIComponent(id)}`,
-      qs: {
-        'filter[fromDate]': fromDate,
-        'filter[thruDate]': thruDate,
-      },
+      apiVersion: 'v1',
+      qs,
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);

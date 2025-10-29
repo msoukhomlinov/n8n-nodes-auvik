@@ -10,6 +10,8 @@ import { tenantFields, tenantOperations } from './resources/tenants/description'
 import { executeTenant } from './resources/tenants/execute';
 import { deviceFields, deviceOperations } from './resources/device/description';
 import { executeDevice } from './resources/device/execute';
+import { deviceV2Fields, deviceV2Operations } from './resources/device-v2/description';
+import { executeDeviceV2 } from './resources/device-v2/execute';
 import { networkFields, networkOperations } from './resources/network/description';
 import { executeNetwork } from './resources/network/execute';
 import { interfaceFields, interfaceOperations } from './resources/interface/description';
@@ -73,6 +75,10 @@ export class Auvik implements INodeType {
             value: 'device',
           },
           {
+            name: 'Device V2 (Beta)',
+            value: 'deviceV2',
+          },
+          {
             name: 'Network',
             value: 'network',
           },
@@ -105,6 +111,8 @@ export class Auvik implements INodeType {
       ...tenantFields,
       deviceOperations,
       ...deviceFields,
+      deviceV2Operations,
+      ...deviceV2Fields,
       networkOperations,
       ...networkFields,
       interfaceOperations,
@@ -140,7 +148,7 @@ export class Auvik implements INodeType {
         const cacheKey = buildCacheKey(['tenants', baseURL]);
         const cached = await kvFileCache.get<INodePropertyOptions[]>(cacheKey);
         if (cached) return cached;
-        const results = await getAllByCursor.call(this, { path: '/tenants' });
+        const results = await getAllByCursor.call(this, { path: '/tenants', apiVersion: 'v1' });
         const options = (results || []).map((r: any) => {
           const name = r?.attributes?.displayName || r?.attributes?.domainPrefix || r?.id;
           return { name: String(name), value: String(r?.id) };
@@ -160,6 +168,7 @@ export class Auvik implements INodeType {
         if (cached) return cached;
         const results = await getAllByCursor.call(this, {
           path: '/inventory/device/info',
+          apiVersion: 'v1',
           qs: tenantsCsv ? { tenants: tenantsCsv } : {},
           fields: {
             device:
@@ -230,6 +239,7 @@ export class Auvik implements INodeType {
         if (cached) return cached;
         const results = await getAllByCursor.call(this, {
           path: '/inventory/network/info',
+          apiVersion: 'v1',
           qs: tenantsCsv ? { tenants: tenantsCsv } : {},
         });
         const options = (results || []).map((r: any) => {
@@ -249,6 +259,9 @@ export class Auvik implements INodeType {
     }
     if (resource === 'device') {
       return await executeDevice.call(this);
+    }
+    if (resource === 'deviceV2') {
+      return await executeDeviceV2.call(this);
     }
     if (resource === 'network') {
       return await executeNetwork.call(this);

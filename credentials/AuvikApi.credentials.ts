@@ -64,7 +64,7 @@ export class AuvikApi implements ICredentialType {
     const resolved =
       region === 'custom' && customBase
         ? customBase
-        : `https://auvikapi.${region}.my.auvik.com/v1`;
+        : `https://auvikapi.${region}.my.auvik.com`;
     const email = String(credentials.email || '').trim();
     const apiKey = String(credentials.apiKey || '').trim();
     return { computedBaseUrl: resolved };

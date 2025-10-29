@@ -1,14 +1,14 @@
 import type { INodeProperties } from 'n8n-workflow';
 import { dateTimePresetOptions } from '../../helpers/options/datePresets';
 
-export const deviceOperations: INodeProperties = {
+export const deviceV2Operations: INodeProperties = {
   displayName: 'Operation',
   name: 'operation',
   type: 'options',
   noDataExpression: true,
   displayOptions: {
     show: {
-      resource: ['device'],
+      resource: ['deviceV2'],
     },
   },
   options: [
@@ -16,19 +16,19 @@ export const deviceOperations: INodeProperties = {
       name: 'Get Many',
       value: 'getMany',
       action: 'Get many devices info',
-      description: 'Read multiple devices’ info',
+      description: 'Read multiple devices\' info (V2 Beta)',
     },
     {
       name: 'Get One',
       value: 'getOne',
       action: 'Get one device info',
-      description: 'Read a single device’s info by ID',
+      description: 'Read a single device\'s info by ID (V2 Beta)',
     },
   ],
   default: 'getMany',
 };
 
-export const deviceFields: INodeProperties[] = [
+export const deviceV2Fields: INodeProperties[] = [
   {
     displayName: 'Return All',
     name: 'returnAll',
@@ -36,7 +36,7 @@ export const deviceFields: INodeProperties[] = [
     default: true,
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
       },
     },
@@ -46,27 +46,28 @@ export const deviceFields: INodeProperties[] = [
     name: 'limit',
     type: 'number',
     typeOptions: { minValue: 1, maxValue: 10000 },
-    default: 100,
+    default: 1000,
+    description: 'Maximum number of results to return (V2 default: 1000, max: 10000)',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
         returnAll: [false],
       },
     },
   },
   {
-    displayName: 'Tenants',
-    name: 'tenants',
-    type: 'multiOptions',
+    displayName: 'Tenant',
+    name: 'tenant',
+    type: 'options',
     typeOptions: {
       loadOptionsMethod: 'getTenants',
     },
-    default: [],
-    description: 'Select one or more tenants to query',
+    default: '',
+    description: 'Select a tenant to query. Child tenants are automatically included in the response.',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
       },
     },
@@ -126,10 +127,89 @@ export const deviceFields: INodeProperties[] = [
       { name: 'Thin Client', value: 'thinClient' },
     ],
     default: '',
-    description: 'Filter by device type',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Make',
+    name: 'filterMake',
+    type: 'string',
+    default: '',
+    description: 'Filter by device make (e.g., Cisco, HP, Dell)',
+    displayOptions: {
+      show: {
+        resource: ['deviceV2'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Model',
+    name: 'filterModel',
+    type: 'string',
+    default: '',
+    description: 'Filter by device model',
+    displayOptions: {
+      show: {
+        resource: ['deviceV2'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Make & Model',
+    name: 'filterMakeModel',
+    type: 'string',
+    default: '',
+    description: 'Filter by device make and model combined (e.g., "Cisco AIR-CAP2700-A-K9")',
+    displayOptions: {
+      show: {
+        resource: ['deviceV2'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Online Status',
+    name: 'filterOnlineStatus',
+    type: 'options',
+    options: [
+      { name: '— Any —', value: '' },
+      { name: 'Online', value: 'online' },
+      { name: 'Offline', value: 'offline' },
+      { name: 'Unreachable', value: 'unreachable' },
+      { name: 'Testing', value: 'testing' },
+      { name: 'Unknown', value: 'unknown' },
+      { name: 'Dormant', value: 'dormant' },
+      { name: 'Not Present', value: 'notPresent' },
+      { name: 'Lower Layer Down', value: 'lowerLayerDown' },
+    ],
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['deviceV2'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Managed Status',
+    name: 'filterManageStatus',
+    type: 'options',
+    options: [
+      { name: '— Any —', value: '' },
+      { name: 'Managed', value: 'true' },
+      { name: 'Unmanaged', value: 'false' },
+    ],
+    default: '',
+    description: 'Whether the device is managed by Auvik',
+    displayOptions: {
+      show: {
+        resource: ['deviceV2'],
         operation: ['getMany'],
       },
     },
@@ -142,195 +222,53 @@ export const deviceFields: INodeProperties[] = [
       loadOptionsMethod: 'getNetworksByTenant',
     },
     default: [],
-    description: 'Filter by IDs of networks this device is on',
+    description: 'Filter by network IDs',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
       },
     },
   },
   {
-    displayName: 'Vendor Name',
-    name: 'filterVendorName',
-    type: 'string',
+    displayName: 'Not Seen Since',
+    name: 'filterNotSeenSince',
+    type: 'dateTime',
     default: '',
-    description: 'Filter by vendor/manufacturer name',
+    description: 'Filter by last seen online time, returning devices not seen online after the provided value',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
-      },
-    },
-  },
-  {
-    displayName: 'Make and Model',
-    name: 'filterMakeModel',
-    type: 'string',
-    default: '',
-    description: 'Filter by the device’s make and model',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany'],
-      },
-    },
-  },
-  {
-    displayName: 'Online Status',
-    name: 'filterOnlineStatus',
-    type: 'options',
-    options: [
-      { name: 'Online', value: 'online' },
-      { name: 'Offline', value: 'offline' },
-      { name: 'Unreachable', value: 'unreachable' },
-      { name: 'Testing', value: 'testing' },
-      { name: 'Unknown', value: 'unknown' },
-      { name: 'Dormant', value: 'dormant' },
-      { name: 'Not Present', value: 'notPresent' },
-      { name: 'Lower Layer Down', value: 'lowerLayerDown' },
-    ],
-    default: '',
-    description: 'Filter by the device’s online status',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany'],
-      },
-    },
-  },
-  {
-    displayName: 'TrafficInsights Status',
-    name: 'filterTrafficInsightsStatus',
-    type: 'options',
-    options: [
-      { name: '— Any —', value: '' },
-      { name: 'Not Detected', value: 'notDetected' },
-      { name: 'Detected', value: 'detected' },
-      { name: 'Not Approved', value: 'notApproved' },
-      { name: 'Approved', value: 'approved' },
-      { name: 'Linking', value: 'linking' },
-      { name: 'Linking Failed', value: 'linkingFailed' },
-      { name: 'Forwarding', value: 'forwarding' },
-    ],
-    default: '',
-    description: 'Filter by the device’s TrafficInsights status',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany'],
-      },
-    },
-  },
-  {
-    displayName: 'Modified After Preset',
-    name: 'modifiedAfterPreset',
-    type: 'options',
-    default: 'LAST_7_DAYS',
-    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    description: 'Quickly set the lower bound for modified time; choose Custom to enter a datetime',
-    displayOptions: { show: { resource: ['device'], operation: ['getMany'] } },
-  },
-  {
-    displayName: 'Modified After',
-    name: 'filterModifiedAfter',
-    type: 'string',
-    default: '',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
-    description: 'Lower bound of modified time (ISO 8601 UTC)',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany'],
-        modifiedAfterPreset: ['CUSTOM'],
       },
     },
   },
   {
     displayName: 'Not Seen Since Preset',
-    name: 'notSeenSincePreset',
+    name: 'filterNotSeenSincePreset',
     type: 'options',
-    default: 'LAST_7_DAYS',
-    options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    description: 'Quickly set the lower bound for last seen time; choose Custom to enter a datetime',
-    displayOptions: { show: { resource: ['device'], operation: ['getMany'] } },
-  },
-  {
-    displayName: 'Not Seen Since',
-    name: 'filterNotSeenSince',
-    type: 'string',
+    options: dateTimePresetOptions,
     default: '',
-    placeholder: 'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
-    description: 'Lower bound of last seen online time (ISO 8601 UTC)',
+    description: 'Quick preset for Not Seen Since filter',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getMany'],
-        notSeenSincePreset: ['CUSTOM'],
-      },
-    },
-  },
-  {
-    displayName: 'State Known',
-    name: 'filterStateKnown',
-    type: 'boolean',
-    default: false,
-    description: 'Only devices with recently updated data',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany'],
-      },
-    },
-  },
-  {
-    displayName: 'Include Device Detail',
-    name: 'includeDeviceDetail',
-    type: 'boolean',
-    default: false,
-    description: 'Include deviceDetail relationship',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany', 'getOne'],
-      },
-    },
-  },
-  {
-    displayName: 'Device Detail Fields',
-    name: 'fieldsDeviceDetail',
-    type: 'multiOptions',
-    options: [
-      { name: 'discoveryStatus', value: 'discoveryStatus' },
-      { name: 'components', value: 'components' },
-      { name: 'connectedDevices', value: 'connectedDevices' },
-      { name: 'configurations', value: 'configurations' },
-      { name: 'manageStatus', value: 'manageStatus' },
-      { name: 'interfaces', value: 'interfaces' },
-      { name: 'trafficInsightsStatus', value: 'trafficInsightsStatus' },
-    ],
-    default: [],
-    description: 'Requires include=deviceDetail',
-    displayOptions: {
-      show: {
-        resource: ['device'],
-        operation: ['getMany', 'getOne'],
-        includeDeviceDetail: [true],
       },
     },
   },
   {
     displayName: 'Device ID',
-    name: 'id',
+    name: 'deviceId',
     type: 'string',
-    required: true,
     default: '',
+    required: true,
+    description: 'The ID of the device to retrieve',
     displayOptions: {
       show: {
-        resource: ['device'],
+        resource: ['deviceV2'],
         operation: ['getOne'],
       },
     },
   },
 ];
-

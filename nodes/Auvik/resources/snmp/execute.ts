@@ -27,21 +27,47 @@ export async function executeSnmp(this: IExecuteFunctions): Promise<INodeExecuti
     if (filterOid) qs['filter[oid]'] = filterOid;
     if (filterName) qs['filter[name]'] = filterName;
 
-    const data = await getAllByCursor.call(this, { path: '/settings/snmppoller', qs });
+    const data = await getAllByCursor.call(this, { path: '/settings/snmppoller', apiVersion: 'v1', qs });
     for (const d of data) returnData.push(d as IDataObject);
   }
 
   if (operation === 'getSetting') {
     const id = this.getNodeParameter('snmpPollerSettingId', 0) as string;
-    const resp = await requestAuvik.call(this, { method: 'GET', path: `/settings/snmppoller/${encodeURIComponent(id)}` });
+    const resp = await requestAuvik.call(this, { method: 'GET', path: `/settings/snmppoller/${encodeURIComponent(id)}`, apiVersion: 'v1' });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
     for (const d of data) returnData.push(d as IDataObject);
   }
 
   if (operation === 'getSettingDevices') {
     const id = this.getNodeParameter('snmpPollerSettingId', 0) as string;
-    const resp = await requestAuvik.call(this, { method: 'GET', path: `/settings/snmppoller/${encodeURIComponent(id)}/devices` });
-    const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];
+    const tenantsSel = this.getNodeParameter('tenantsDevices', 0, []) as string[];
+    const filterOnlineStatus = this.getNodeParameter('filterOnlineStatus', 0, '') as string;
+    const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
+    let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
+    const filterNotSeenSince = this.getNodeParameter('filterNotSeenSince', 0, '') as string;
+    const filterDeviceTypeDevices = this.getNodeParameter('filterDeviceTypeDevices', 0, '') as string;
+    const filterMakeModelDevices = this.getNodeParameter('filterMakeModelDevices', 0, '') as string;
+    const filterVendorNameDevices = this.getNodeParameter('filterVendorNameDevices', 0, '') as string;
+
+    const qs: IDataObject = {};
+    if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
+    if (filterOnlineStatus) qs['filter[onlineStatus]'] = filterOnlineStatus;
+    if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+      const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
+      filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
+    }
+    if (filterModifiedAfter) {
+      const { assertIsoDateTime } = require('../../helpers/validation');
+      assertIsoDateTime.call(this, filterModifiedAfter, 'filter[modifiedAfter]');
+      qs['filter[modifiedAfter]'] = filterModifiedAfter;
+    }
+    if (filterNotSeenSince) qs['filter[notSeenSince]'] = filterNotSeenSince;
+    if (filterDeviceTypeDevices) qs['filter[deviceType]'] = filterDeviceTypeDevices;
+    if (filterMakeModelDevices) qs['filter[makeModel]'] = filterMakeModelDevices;
+    if (filterVendorNameDevices) qs['filter[vendorName]'] = filterVendorNameDevices;
+
+    const path = `/settings/snmppoller/${encodeURIComponent(id)}/devices`;
+    const data = await getAllByCursor.call(this, { path, apiVersion: 'v1', qs });
     for (const d of data) returnData.push(d as IDataObject);
   }
 
@@ -105,7 +131,7 @@ export async function executeSnmp(this: IExecuteFunctions): Promise<INodeExecuti
       return [this.helpers.returnJsonArray([{ debug: debugPayload }])];
     }
 
-    const data = await getAllByCursor.call(this, { path, qs });
+    const data = await getAllByCursor.call(this, { path, apiVersion: 'v1', qs });
     for (const d of data) returnData.push(d as IDataObject);
   }
 

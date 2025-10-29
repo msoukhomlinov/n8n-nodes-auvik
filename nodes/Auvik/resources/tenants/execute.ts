@@ -14,6 +14,7 @@ export async function executeTenant(this: IExecuteFunctions): Promise<INodeExecu
 
     const data = await getAllByCursor.call(this, {
       path: '/tenants',
+      apiVersion: 'v1',
     });
 
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -23,7 +24,7 @@ export async function executeTenant(this: IExecuteFunctions): Promise<INodeExecu
   if (operation === 'getManyDetail') {
     const returnAll = this.getNodeParameter('returnAll', 0) as boolean;
     const limit = this.getNodeParameter('limit', 0, 100) as number;
-    const tenantDomainPrefix = this.getNodeParameter('tenantDomainPrefix', 0) as string;
+    const tenantDomainPrefix = String(this.getNodeParameter('tenantDomainPrefix', 0) as string).trim();
     const filterAvailableTenants = this.getNodeParameter('filterAvailableTenants', 0) as boolean;
 
     const qs: IDataObject = {
@@ -33,6 +34,7 @@ export async function executeTenant(this: IExecuteFunctions): Promise<INodeExecu
 
     const data = await getAllByCursor.call(this, {
       path: '/tenants/detail',
+      apiVersion: 'v1',
       qs,
     });
     const sliced = returnAll ? data : data.slice(0, limit);
@@ -41,10 +43,11 @@ export async function executeTenant(this: IExecuteFunctions): Promise<INodeExecu
 
   if (operation === 'getOneDetail') {
     const id = this.getNodeParameter('id', 0) as string;
-    const tenantDomainPrefix = this.getNodeParameter('tenantDomainPrefix', 0) as string;
+    const tenantDomainPrefix = String(this.getNodeParameter('tenantDomainPrefix', 0) as string).trim();
     const resp = await requestAuvik.call(this, {
       method: 'GET',
       path: `/tenants/detail/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
       qs: { tenantDomainPrefix },
     });
     const data = Array.isArray(resp?.data) ? resp.data : [resp?.data];

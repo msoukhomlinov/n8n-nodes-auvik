@@ -232,6 +232,12 @@ Located in `/.cursor-rules`.
  - Tenants API single-detail endpoint `/tenants/detail/{id}` requires `tenantDomainPrefix` as a query parameter; surface this field in UI for both `getManyDetail` and `getOneDetail`, and pass it via `qs`.
  - Do not serialise credentials in cache keys; scope caches to resolved API base URL only.
  - Do not return computed Basic `Authorization` from credential pre-auth; compute headers at request time only.
+ - Auvik API v2 uses different path format: `/v2/api/` vs `/v1/` - update `buildVersionedPath()` accordingly.
+ - v2 pagination defaults: 1000 page size (vs v1's 100), max 10000; make pagination helper version-aware.
+ - v2 schema changes: `vendorName`→`make`, old `makeModel`→`model`, new `makeModel` (combined), `manageStatus` in main attrs.
+ - v2 tenant param: single `tenant` (not `filter[tenants]` array) with auto-child inclusion; update UI to single-select.
+ - v2 removes: `include`/`fields[]` params, `deviceDetail` relationship, `lastModified`/`stateKnown` fields.
+ - v2 adds: `filter[manageStatus]` boolean, includes endpoint & service devices.
 
 # Scratchpad
 
@@ -279,6 +285,7 @@ Located in `/.cursor-rules`.
 - [x] Configuration (multi/single). (2025-08-12)
 - [x] SNMP Poller (settings multi/single/devices + History string/numeric). (2025-08-12)
  - [x] ASM (selected read endpoints). (2025-08-12)
+  - [x] Aligned ASM resource with API v1 spec: fixed required clientId parameters, added missing license endpoint, enhanced apps filters with 4 date filters, corrected include enums. (2025-08-13)
 - [x] Playbook (composites): Triage Alerts, Health Snapshot, Search Entities (2025-08-13)
   - [x] Centralised date preset options and aligned Health Snapshot lookback with Triage Alerts (default LAST_7_DAYS). Structured Health Snapshot output with counts and grouped sections. (2025-08-13)
 - **Acceptance**: Endpoints verified against spec; errors surfaced via `NodeApiError`.
@@ -298,6 +305,10 @@ Located in `/.cursor-rules`.
  - [x] Fix Auvik credential test to use `baseURL` + `/authentication/verify` with explicit `Authorization` and `Accept` headers; trim inputs and preserve region/custom mapping. (2025-08-13)
  - [x] Remove Auvik credential test block from `credentials/AuvikApi.credentials.ts` per decision to rely on operational auth only. (2025-08-13)
  - [x] Tighten `nodes/Auvik/auvik.svg` viewBox to reduce whitespace around the icon for better fit in n8n UI. (2025-08-13)
+ - [x] Align COMPONENT resource with API v1: fix filterCurrentStatus default to empty (no filtering), add ISO datetime validation for filterModifiedAfter, and add Modified After Preset UX pattern. (2025-08-13)
+ - [x] Add datetime presets and validation to Entity and SNMP resources: Added Modified After Preset options and ISO datetime validation for all filterModifiedAfter parameters across Entity (audits/notes) and SNMP resources for consistency. (2025-08-13)
+ - [x] Add missing Alert Definition ID filter to Alert History resource: Added `filter[alertDefinitionId]` parameter to align with Auvik API v1 specification, skipping deprecated `filter[alertSpecificationId]` parameter. (2025-08-13)
+ - [x] Implement Auvik API v2 Device support: Created separate Device V2 resource with updated schema, single-tenant selection, enhanced pagination (1000 default), and new filters. Updated path building for `/v2/api/` format and documented v2 patterns. (2025-10-29)
 
 ### Notes
 - Preserve original filters and `include/fields[]` across paginated requests.
