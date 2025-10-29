@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-auvik",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Auvik node for n8n",
   "author": "Max Soukhomlinov <maxs@intellectit.com.au>",
   "homepage": "https://github.com/msoukhomlinov/n8n-nodes-auvik",

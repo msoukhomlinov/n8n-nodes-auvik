@@ -2,8 +2,6 @@
 
 An n8n community node for Auvik’s JSON:API.
 
-> Status: First public release — v0.5.0 (2025-10-29)
-
 ### Release
 This is the first public release of the Auvik community node for n8n. See the [Changelog](CHANGELOG.md) for details.
 
