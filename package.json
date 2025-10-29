@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-auvik",
+  "name": "@msoukhomlinov/n8n-nodes-auvik",
   "version": "0.5.3",
   "description": "Auvik node for n8n",
   "author": "Max Soukhomlinov <maxs@intellectit.com.au>",
@@ -9,8 +9,12 @@
     "n8n-community-node",
     "auvik"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msoukhomlinov/n8n-nodes-auvik.git"
+  },
   "bugs": {
-    "email": "maxs@intellectit.com.au"
+    "url": "https://github.com/msoukhomlinov/n8n-nodes-auvik/issues"
   },
   "license": "MIT",
   "type": "commonjs",
