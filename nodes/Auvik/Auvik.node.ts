@@ -5,7 +5,6 @@ import type {
   ILoadOptionsFunctions,
   INodePropertyOptions,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
 import { tenantFields, tenantOperations } from './resources/tenants/description';
 import { executeTenant } from './resources/tenants/execute';
 import { deviceFields, deviceOperations } from './resources/device/description';
@@ -51,8 +50,8 @@ export class Auvik implements INodeType {
     defaults: {
       name: 'Auvik',
     },
-    inputs: [NodeConnectionType.Main],
-    outputs: [NodeConnectionType.Main],
+    inputs: ['main'],
+    outputs: ['main'],
     credentials: [
       {
         name: 'auvikApi',

@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-auvik",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "description": "Auvik node for n8n",
   "author": "Max Soukhomlinov <maxs@intellectit.com.au>",
   "homepage": "https://github.com/msoukhomlinov/n8n-nodes-auvik",
@@ -23,7 +23,13 @@
     "node": ">=18.10.0"
   },
   "n8n": {
-    "n8nNodesApiVersion": 1
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/AuvikApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Auvik/Auvik.node.js"
+    ]
   },
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig.json && npm run copy:assets",
@@ -39,9 +45,12 @@
     "copyfiles": "^2.4.1",
     "eslint": "^9.7.0",
     "eslint-plugin-n8n-nodes-base": "^1.11.0",
-    "n8n-workflow": "^1.82.0",
+    "n8n-workflow": "^1.115.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.10.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
   }
 }

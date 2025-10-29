@@ -315,7 +315,9 @@ Located in `/.cursor-rules`.
 - Avoid retries on 401/403; backoff with jitter on 429/503/504.
 
 - ESLint v9+ requires flat config (`eslint.config.js`) with `@typescript-eslint/parser`; avoid legacy `.eslintrc.*` and `.eslintignore`.
-- For n8n nodes, use `NodeConnectionType.Main` for `inputs`/`outputs` instead of string literals to satisfy type checks.
+- For n8n nodes with n8n-workflow >= 1.115, use string literals `'main'` for `inputs`/`outputs` as `NodeConnectionType` is type-only.
+- n8n community nodes MUST export both node and credential classes from `index.ts` AND declare them in `package.json` under `"n8n": { "credentials": [...], "nodes": [...] }`.
+- n8n-workflow MUST be a `peerDependency` (not `devDependency` or `dependency`) to avoid runtime module resolution failures in n8n.
 
 ## Playbook Support Matrix (from `.docs/auvik/openapi-spec.json`)
 - Alert triage: supported via `/alert/history/info` and `/alert/dismiss/{id}`

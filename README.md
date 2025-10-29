@@ -1,6 +1,6 @@
 # n8n-nodes-auvik
 
-An n8n community node for Auvik’s JSON:API.
+An n8n community node for Auvik’s REST API.
 
 ### Release
 This is the first public release of the Auvik community node for n8n. See the [Changelog](CHANGELOG.md) for details.
