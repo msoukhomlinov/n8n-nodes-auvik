@@ -1,4 +1,4 @@
-# @msoukhomlinov/n8n-nodes-auvik
+# n8n-nodes-auvik
 
 An n8n community node for Auvik’s REST API.
 

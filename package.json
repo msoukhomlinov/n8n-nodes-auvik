@@ -1,5 +1,5 @@
 {
-  "name": "@msoukhomlinov/n8n-nodes-auvik",
+  "name": "n8n-nodes-auvik",
   "version": "0.5.3",
   "description": "Auvik node for n8n",
   "author": "Max Soukhomlinov <maxs@intellectit.com.au>",
@@ -18,6 +18,10 @@
   },
   "license": "MIT",
   "type": "commonjs",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
