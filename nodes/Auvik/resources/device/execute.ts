@@ -2,12 +2,13 @@ import type { IExecuteFunctions, IDataObject, INodeExecutionData } from 'n8n-wor
 import { getAllByCursor } from '../../helpers/pagination';
 import { requestAuvik } from '../../helpers/http/request';
 
-function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
+function buildDeviceQuery(this: IExecuteFunctions): { qs: IDataObject; filterDeviceName: string } {
   const tenantsSel = this.getNodeParameter('tenants', 0, []) as string[];
   const filterDeviceType = this.getNodeParameter('filterDeviceType', 0, '') as string;
   const filterNetworks = this.getNodeParameter('filterNetworks', 0, []) as string[];
   const filterVendorName = this.getNodeParameter('filterVendorName', 0, '') as string;
   const filterMakeModel = this.getNodeParameter('filterMakeModel', 0, '') as string;
+  const filterDeviceName = this.getNodeParameter('filterDeviceName', 0, '') as string;
   const filterOnlineStatus = this.getNodeParameter('filterOnlineStatus', 0, '') as string;
   const filterTrafficInsightsStatus = this.getNodeParameter('filterTrafficInsightsStatus', 0, '') as string;
   const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'NO_FILTER') as string;
@@ -51,7 +52,7 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
     if (fieldsDeviceDetail.length) qs['fields[deviceDetail]'] = fieldsDeviceDetail.join(',');
   }
 
-  return qs;
+  return { qs, filterDeviceName };
 }
 
 export async function executeDevice(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -62,12 +63,25 @@ export async function executeDevice(this: IExecuteFunctions): Promise<INodeExecu
     const returnAll = this.getNodeParameter('returnAll', 0) as boolean;
     const limit = this.getNodeParameter('limit', 0, 100) as number;
 
-    const qs = buildDeviceQuery.call(this);
-    const data = await getAllByCursor.call(this, {
+    const { qs, filterDeviceName } = buildDeviceQuery.call(this);
+    let data = await getAllByCursor.call(this, {
       path: '/inventory/device/info',
       apiVersion: 'v1',
       qs,
     });
+
+    // Apply client-side filtering by device name if specified
+    if (filterDeviceName) {
+      const searchTerm = filterDeviceName.toLowerCase();
+      data = data.filter((device: any) => {
+        const deviceName = device?.attributes?.deviceName;
+        if (typeof deviceName === 'string') {
+          return deviceName.toLowerCase().includes(searchTerm);
+        }
+        return false;
+      });
+    }
+
     const sliced = returnAll ? data : data.slice(0, limit);
     for (const d of sliced) returnData.push(d as IDataObject);
   }

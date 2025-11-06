@@ -168,7 +168,20 @@ export const deviceFields: INodeProperties[] = [
     name: 'filterMakeModel',
     type: 'string',
     default: '',
-    description: 'Filter by the device’s make and model',
+    description: 'Filter by the device\'s make and model',
+    displayOptions: {
+      show: {
+        resource: ['device'],
+        operation: ['getMany'],
+      },
+    },
+  },
+  {
+    displayName: 'Device Name',
+    name: 'filterDeviceName',
+    type: 'string',
+    default: '',
+    description: 'Filter by device name (client-side filtering)',
     displayOptions: {
       show: {
         resource: ['device'],

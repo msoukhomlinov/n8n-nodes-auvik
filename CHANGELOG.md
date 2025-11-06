@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.5] - 2025-11-06
+### Added
+- Device (v1): Client-side filtering by device name
+
 ## [0.5.4] - 2025-11-06
 ### Fixed
 - SNMP Poller Get History operations now correctly align with Auvik API specification
