@@ -13,7 +13,7 @@ function buildAlertHistoryQuery(this: IExecuteFunctions): IDataObject {
   const preset = this.getNodeParameter('detectedTimePreset', 0, 'LAST_7_DAYS') as string;
   let filterDetectedTimeAfter = this.getNodeParameter('filterDetectedTimeAfter', 0, '') as string;
   let filterDetectedTimeBefore = this.getNodeParameter('filterDetectedTimeBefore', 0, '') as string;
-  if (preset && preset !== 'CUSTOM') {
+  if (preset && preset !== 'CUSTOM' && preset !== 'NO_FILTER') {
     const { computeDateTimeRangeUtc } = require('../../helpers/options/datePresets');
     const range = computeDateTimeRangeUtc(preset);
     filterDetectedTimeAfter = range.from;

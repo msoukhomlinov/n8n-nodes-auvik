@@ -12,7 +12,7 @@ function buildComponentQuery(this: IExecuteFunctions): IDataObject {
 
   const qs: IDataObject = {};
   if (Array.isArray(tenantsSel) && tenantsSel.length) qs.tenants = tenantsSel.join(',');
-  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM' && modifiedAfterPreset !== 'NO_FILTER') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
   }

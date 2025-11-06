@@ -238,5 +238,23 @@ Located in `/.cursor-rules`.
  - v2 tenant param: single `tenant` (not `filter[tenants]` array) with auto-child inclusion; update UI to single-select.
  - v2 removes: `include`/`fields[]` params, `deviceDetail` relationship, `lastModified`/`stateKnown` fields.
  - v2 adds: `filter[manageStatus]` boolean, includes endpoint & service devices.
+ - SNMP Poller History API: `tenants` is required parameter; `filter[compact]` only supported on string endpoint (not numeric), must be string `"true"` not boolean; numeric endpoint requires `filter[interval]`. API will return empty results if: SNMP Pollers not configured, no historical data exists for time range, or incorrect SNMP Poller Setting IDs provided.
+ - SNMP Poller History validation: When deviceId provided, validate it exists in tenant(s) before API call; when both deviceId and settingIds provided, validate settings are configured for that device by querying `/settings/snmppoller` with device filter.
 
 # Scratchpad
+
+## Task: Add "— Any —" Option to Device Online Status Filter (Completed 2025-11-06)
+
+### Issue
+The `filterOnlineStatus` field lacked an explicit "— Any —" option, making the optional filtering behaviour unclear to users. The default was an empty string, but this wasn't visible in the UI.
+
+### Solution Implemented
+[X] Added `{ name: '— Any —', value: '' }` as first option in filterOnlineStatus
+[X] Matches pattern used in Device Type and TrafficInsights Status filters
+[X] API spec confirms filter[onlineStatus] is optional (required: false)
+
+### Files Modified
+- `nodes/Auvik/resources/device/description.ts` - Added "— Any —" option to filterOnlineStatus
+
+### Result
+Users can now explicitly see and select the "no filter" option, improving UX consistency across all Device resource filter fields.

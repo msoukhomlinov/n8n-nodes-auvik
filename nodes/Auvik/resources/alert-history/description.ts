@@ -57,7 +57,7 @@ export const alertHistoryFields: INodeProperties[] = [
     displayName: 'Detected Time Preset',
     name: 'detectedTimePreset',
     type: 'options',
-    default: 'LAST_7_DAYS',
+    default: 'NO_FILTER',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     description: 'Quickly select detected time range; choose Custom to enter specific values below',
     displayOptions: { show: { resource: ['alertHistory'], operation: ['getMany'] } },
@@ -83,11 +83,11 @@ export const alertHistoryFields: INodeProperties[] = [
     name: 'filterSeverity',
     type: 'options',
     options: [
-      { name: 'Unknown', value: 'unknown' },
-      { name: 'Emergency', value: 'emergency' },
       { name: 'Critical', value: 'critical' },
-      { name: 'Warning', value: 'warning' },
+      { name: 'Emergency', value: 'emergency' },
       { name: 'Info', value: 'info' },
+      { name: 'Unknown', value: 'unknown' },
+      { name: 'Warning', value: 'warning' },
     ],
     default: 'warning',
     displayOptions: {
@@ -103,8 +103,8 @@ export const alertHistoryFields: INodeProperties[] = [
     type: 'options',
     options: [
       { name: 'Created', value: 'created' },
-      { name: 'Resolved', value: 'resolved' },
       { name: 'Paused', value: 'paused' },
+      { name: 'Resolved', value: 'resolved' },
       { name: 'Unpaused', value: 'unpaused' },
     ],
     default: 'created',

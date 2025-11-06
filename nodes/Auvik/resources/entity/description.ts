@@ -23,13 +23,13 @@ export const entityFields: INodeProperties[] = [
 
   // Audits filters
   { displayName: 'User', name: 'filterUser', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
-  { displayName: 'Category', name: 'filterCategory', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Unknown', value: 'unknown' }, { name: 'Tunnel', value: 'tunnel' }, { name: 'Terminal', value: 'terminal' }, { name: 'Remote Browser', value: 'remoteBrowser' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
-  { displayName: 'Status', name: 'filterStatus', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Unknown', value: 'unknown' }, { name: 'Initiated', value: 'initiated' }, { name: 'Created', value: 'created' }, { name: 'Closed', value: 'closed' }, { name: 'Failed', value: 'failed' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
+  { displayName: 'Category', name: 'filterCategory', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Remote Browser', value: 'remoteBrowser' }, { name: 'Terminal', value: 'terminal' }, { name: 'Tunnel', value: 'tunnel' }, { name: 'Unknown', value: 'unknown' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
+  { displayName: 'Status', name: 'filterStatus', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Closed', value: 'closed' }, { name: 'Created', value: 'created' }, { name: 'Failed', value: 'failed' }, { name: 'Initiated', value: 'initiated' }, { name: 'Unknown', value: 'unknown' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } } },
   {
     displayName: 'Modified After Preset',
     name: 'modifiedAfterPreset',
     type: 'options',
-    default: 'LAST_7_DAYS',
+    default: 'NO_FILTER',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     description: 'Quickly set the lower bound for modified time; choose Custom to enter a datetime',
     displayOptions: { show: { resource: ['entity'], operation: ['getManyAudits'] } },
@@ -53,14 +53,14 @@ export const entityFields: INodeProperties[] = [
 
   // Notes filters
   { displayName: 'Entity ID', name: 'filterEntityId', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
-  { displayName: 'Entity Type', name: 'filterEntityType', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Root', value: 'root' }, { name: 'Device', value: 'device' }, { name: 'Network', value: 'network' }, { name: 'Interface', value: 'interface' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
+  { displayName: 'Entity Type', name: 'filterEntityType', type: 'options', options: [{ name: 'Any', value: '' }, { name: 'Device', value: 'device' }, { name: 'Interface', value: 'interface' }, { name: 'Network', value: 'network' }, { name: 'Root', value: 'root' }], default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   { displayName: 'Entity Name', name: 'filterEntityName', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   { displayName: 'Last Modified By', name: 'filterLastModifiedBy', type: 'string', default: '', displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } } },
   {
     displayName: 'Modified After Preset',
     name: 'notesModifiedAfterPreset',
     type: 'options',
-    default: 'LAST_7_DAYS',
+    default: 'NO_FILTER',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     description: 'Quickly set the lower bound for modified time; choose Custom to enter a datetime',
     displayOptions: { show: { resource: ['entity'], operation: ['getManyNotes'] } },

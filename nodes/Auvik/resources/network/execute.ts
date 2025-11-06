@@ -17,7 +17,7 @@ function buildNetworkQuery(this: IExecuteFunctions): IDataObject {
   if (filterNetworkType) qs['filter[networkType]'] = filterNetworkType;
   if (filterScanStatus) qs['filter[scanStatus]'] = filterScanStatus;
   if (Array.isArray(devicesSel) && devicesSel.length) qs['filter[devices]'] = devicesSel.join(',');
-  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM' && modifiedAfterPreset !== 'NO_FILTER') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
   }

@@ -19,7 +19,7 @@ function buildInterfaceQuery(this: IExecuteFunctions): IDataObject {
     qs['filter[adminStatus]'] = filterAdminStatus;
   }
   if (filterOperationalStatus) qs['filter[operationalStatus]'] = filterOperationalStatus;
-  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM' && modifiedAfterPreset !== 'NO_FILTER') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
   }

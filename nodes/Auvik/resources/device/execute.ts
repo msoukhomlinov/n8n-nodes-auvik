@@ -10,9 +10,9 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   const filterMakeModel = this.getNodeParameter('filterMakeModel', 0, '') as string;
   const filterOnlineStatus = this.getNodeParameter('filterOnlineStatus', 0, '') as string;
   const filterTrafficInsightsStatus = this.getNodeParameter('filterTrafficInsightsStatus', 0, '') as string;
-  const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'LAST_7_DAYS') as string;
+  const modifiedAfterPreset = this.getNodeParameter('modifiedAfterPreset', 0, 'NO_FILTER') as string;
   let filterModifiedAfter = this.getNodeParameter('filterModifiedAfter', 0, '') as string;
-  const notSeenSincePreset = this.getNodeParameter('notSeenSincePreset', 0, 'LAST_7_DAYS') as string;
+  const notSeenSincePreset = this.getNodeParameter('notSeenSincePreset', 0, 'NO_FILTER') as string;
   let filterNotSeenSince = this.getNodeParameter('filterNotSeenSince', 0, '') as string;
   const filterStateKnown = this.getNodeParameter('filterStateKnown', 0, false) as boolean;
   const includeDeviceDetail = this.getNodeParameter('includeDeviceDetail', 0, false) as boolean;
@@ -26,7 +26,7 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
   if (filterMakeModel) qs['filter[makeModel]'] = filterMakeModel;
   if (filterOnlineStatus) qs['filter[onlineStatus]'] = filterOnlineStatus;
   if (filterTrafficInsightsStatus) qs['filter[trafficInsightsStatus]'] = filterTrafficInsightsStatus;
-  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+  if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM' && modifiedAfterPreset !== 'NO_FILTER') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
   }
@@ -35,7 +35,7 @@ function buildDeviceQuery(this: IExecuteFunctions): IDataObject {
     assertIsoDateTime.call(this, filterModifiedAfter, 'filter[modifiedAfter]');
     qs['filter[modifiedAfter]'] = filterModifiedAfter;
   }
-  if (notSeenSincePreset && notSeenSincePreset !== 'CUSTOM') {
+  if (notSeenSincePreset && notSeenSincePreset !== 'CUSTOM' && notSeenSincePreset !== 'NO_FILTER') {
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     filterNotSeenSince = computeAfterDateTimeUtc(notSeenSincePreset);
   }

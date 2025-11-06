@@ -3,7 +3,7 @@ import { getAllByCursor } from '../../helpers/pagination';
 import { requestAuvik } from '../../helpers/http/request';
 
 function isoRangeFromPreset(preset: string): { from?: string; to?: string } {
-  if (preset && preset !== 'CUSTOM') {
+  if (preset && preset !== 'CUSTOM' && preset !== 'NO_FILTER') {
     const { computeDateTimeRangeUtc } = require('../../helpers/options/datePresets');
     return computeDateTimeRangeUtc(preset);
   }
@@ -29,7 +29,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     const returnAll = this.getNodeParameter('returnAll', 0, true) as boolean;
     const limit = this.getNodeParameter('limit', 0, 100) as number;
 
-    if (detectedTimePreset && detectedTimePreset !== 'CUSTOM') {
+    if (detectedTimePreset && detectedTimePreset !== 'CUSTOM' && detectedTimePreset !== 'NO_FILTER') {
       const range = isoRangeFromPreset(detectedTimePreset);
       filterDetectedTimeAfter = range.from || filterDetectedTimeAfter;
       filterDetectedTimeBefore = range.to || filterDetectedTimeBefore;
@@ -64,7 +64,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
       if (includeUtilisation && entityType === 'device' && entityId) {
         let fromIso: string | undefined;
         let toIso: string | undefined;
-        if (utilisationPreset && utilisationPreset !== 'CUSTOM') {
+        if (utilisationPreset && utilisationPreset !== 'CUSTOM' && utilisationPreset !== 'NO_FILTER') {
           const range = isoRangeFromPreset(utilisationPreset);
           fromIso = range.from;
           toIso = range.to;
@@ -208,7 +208,7 @@ export async function executePlaybook(this: IExecuteFunctions): Promise<INodeExe
     const includeLists = this.getNodeParameter('includeLists', 0, false) as boolean;
     const tenantsCsv = Array.isArray(tenantsSel) && tenantsSel.length ? tenantsSel.join(',') : undefined;
 
-    if (snapshotPreset && snapshotPreset !== 'CUSTOM') {
+    if (snapshotPreset && snapshotPreset !== 'CUSTOM' && snapshotPreset !== 'NO_FILTER') {
       const range = isoRangeFromPreset(snapshotPreset);
       snapshotFrom = range.from || snapshotFrom;
       snapshotTo = range.to || snapshotTo;

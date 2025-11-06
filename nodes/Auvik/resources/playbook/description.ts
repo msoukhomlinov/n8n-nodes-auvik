@@ -32,10 +32,10 @@ export const playbookFields: INodeProperties[] = [
     type: 'options',
     options: [
       { name: 'Any', value: '' },
-      { name: 'Emergency', value: 'emergency' },
       { name: 'Critical', value: 'critical' },
-      { name: 'Warning', value: 'warning' },
+      { name: 'Emergency', value: 'emergency' },
       { name: 'Info', value: 'info' },
+      { name: 'Warning', value: 'warning' },
     ],
     default: '',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'] } },
@@ -45,7 +45,7 @@ export const playbookFields: INodeProperties[] = [
     name: 'detectedTimePreset',
     type: 'options',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    default: 'LAST_30_MINUTES',
+    default: 'NO_FILTER',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'] } },
   },
   {
@@ -83,7 +83,7 @@ export const playbookFields: INodeProperties[] = [
     name: 'utilisationPreset',
     type: 'options',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    default: 'LAST_1_HOUR',
+    default: 'NO_FILTER',
     displayOptions: { show: { resource: ['playbook'], operation: ['triageAlerts'], includeUtilisation: [true] } },
   },
   {
@@ -132,9 +132,9 @@ export const playbookFields: INodeProperties[] = [
     name: 'severityThreshold',
     type: 'options',
     options: [
+      { name: 'Any', value: '' },
       { name: 'Critical+', value: 'critical' },
       { name: 'Warning+', value: 'warning' },
-      { name: 'Any', value: '' },
     ],
     default: 'critical',
     displayOptions: { show: { resource: ['playbook'], operation: ['healthSnapshot'] } },
@@ -144,7 +144,7 @@ export const playbookFields: INodeProperties[] = [
     name: 'snapshotPreset',
     type: 'options',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
-    default: 'LAST_7_DAYS',
+    default: 'NO_FILTER',
     displayOptions: { show: { resource: ['playbook'], operation: ['healthSnapshot'] } },
   },
   {

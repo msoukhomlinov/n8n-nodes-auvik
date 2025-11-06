@@ -8,7 +8,7 @@ export async function executeUsage(this: IExecuteFunctions): Promise<INodeExecut
   let fromDate = this.getNodeParameter('fromDate', 0, '') as string;
   let thruDate = this.getNodeParameter('thruDate', 0, '') as string;
   const datePreset = this.getNodeParameter('datePreset', 0, 'LAST_30_DAYS') as string;
-  if (datePreset && datePreset !== 'CUSTOM') {
+  if (datePreset && datePreset !== 'CUSTOM' && datePreset !== 'NO_FILTER') {
     const { computeDateRangeUtc } = await import('../../helpers/options/datePresets');
     const range = computeDateRangeUtc(datePreset as any);
     fromDate = range.from;

@@ -20,7 +20,7 @@ export async function executeEntity(this: IExecuteFunctions): Promise<INodeExecu
     if (filterUser) qs['filter[user]'] = filterUser;
     if (filterCategory) qs['filter[category]'] = filterCategory;
     if (filterStatus) qs['filter[status]'] = filterStatus;
-    if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM') {
+    if (modifiedAfterPreset && modifiedAfterPreset !== 'CUSTOM' && modifiedAfterPreset !== 'NO_FILTER') {
       const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
       filterModifiedAfter = computeAfterDateTimeUtc(modifiedAfterPreset);
     }
@@ -59,7 +59,7 @@ export async function executeEntity(this: IExecuteFunctions): Promise<INodeExecu
     if (filterEntityType) qs['filter[entityType]'] = filterEntityType;
     if (filterEntityName) qs['filter[entityName]'] = filterEntityName;
     if (filterLastModifiedBy) qs['filter[lastModifiedBy]'] = filterLastModifiedBy;
-    if (notesModifiedAfterPreset && notesModifiedAfterPreset !== 'CUSTOM') {
+    if (notesModifiedAfterPreset && notesModifiedAfterPreset !== 'CUSTOM' && notesModifiedAfterPreset !== 'NO_FILTER') {
       const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
       filterNotesModifiedAfter = computeAfterDateTimeUtc(notesModifiedAfterPreset);
     }

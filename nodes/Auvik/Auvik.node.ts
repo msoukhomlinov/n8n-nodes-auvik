@@ -66,8 +66,24 @@ export class Auvik implements INodeType {
         noDataExpression: true,
         options: [
           {
-            name: 'Tenant',
-            value: 'tenant',
+            name: 'Alert',
+            value: 'alert',
+          },
+          {
+            name: 'Alert History',
+            value: 'alertHistory',
+          },
+          {
+            name: 'ASM',
+            value: 'asm',
+          },
+          {
+            name: 'Component',
+            value: 'component',
+          },
+          {
+            name: 'Configuration',
+            value: 'configuration',
           },
           {
             name: 'Device',
@@ -78,31 +94,33 @@ export class Auvik implements INodeType {
             value: 'deviceV2',
           },
           {
-            name: 'Network',
-            value: 'network',
+            name: 'Entity',
+            value: 'entity',
           },
           {
             name: 'Interface',
             value: 'interface',
           },
           {
-            name: 'Alert History',
-            value: 'alertHistory',
+            name: 'Network',
+            value: 'network',
           },
           {
-            name: 'Alert',
-            value: 'alert',
+            name: 'Playbook',
+            value: 'playbook',
+          },
+          {
+            name: 'SNMP Poller',
+            value: 'snmp',
+          },
+          {
+            name: 'Tenant',
+            value: 'tenant',
           },
           {
             name: 'Usage',
             value: 'usage',
           },
-          { name: 'Component', value: 'component' },
-          { name: 'Configuration', value: 'configuration' },
-          { name: 'Entity', value: 'entity' },
-          { name: 'SNMP Poller', value: 'snmp' },
-          { name: 'ASM', value: 'asm' },
-          { name: 'Playbook', value: 'playbook' },
         ],
         default: 'tenant',
       },
@@ -298,5 +316,6 @@ export class Auvik implements INodeType {
     return [this.helpers.returnJsonArray([])];
   }
 }
+
 
 

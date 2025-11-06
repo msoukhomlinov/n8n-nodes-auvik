@@ -75,7 +75,7 @@ async function executeGetMany(this: IExecuteFunctions) {
 
   // Not seen since filter
   let notSeenSinceValue = filterNotSeenSince;
-  if (filterNotSeenSincePreset && filterNotSeenSincePreset !== 'CUSTOM' && !notSeenSinceValue) {
+  if (filterNotSeenSincePreset && filterNotSeenSincePreset !== 'CUSTOM' && filterNotSeenSincePreset !== 'NO_FILTER' && !notSeenSinceValue) {
     // Apply preset if no manual value provided
     const { computeAfterDateTimeUtc } = require('../../helpers/options/datePresets');
     notSeenSinceValue = computeAfterDateTimeUtc(filterNotSeenSincePreset);

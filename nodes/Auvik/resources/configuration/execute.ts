@@ -8,7 +8,7 @@ function buildConfigurationQuery(this: IExecuteFunctions): IDataObject {
   const backupTimePreset = this.getNodeParameter('backupTimePreset', 0, 'LAST_30_DAYS') as string;
   let filterBackupTimeAfter = this.getNodeParameter('filterBackupTimeAfter', 0, '') as string;
   let filterBackupTimeBefore = this.getNodeParameter('filterBackupTimeBefore', 0, '') as string;
-  if (backupTimePreset && backupTimePreset !== 'CUSTOM') {
+  if (backupTimePreset && backupTimePreset !== 'CUSTOM' && backupTimePreset !== 'NO_FILTER') {
     const { computeDateTimeRangeUtc } = require('../../helpers/options/datePresets');
     const range = computeDateTimeRangeUtc(backupTimePreset as any);
     filterBackupTimeAfter = range.from;

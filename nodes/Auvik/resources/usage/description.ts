@@ -32,7 +32,7 @@ export const usageFields: INodeProperties[] = [
     displayName: 'Date Preset',
     name: 'datePreset',
     type: 'options',
-    default: 'LAST_30_DAYS',
+    default: 'NO_FILTER',
     options: [...dateTimePresetOptions, { name: 'Custom', value: 'CUSTOM' }],
     description: 'Quickly select a date range. Choose Custom to enter specific dates.',
     displayOptions: {
