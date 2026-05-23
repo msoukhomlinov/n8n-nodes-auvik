@@ -17,7 +17,10 @@ export interface AuvikRequestOptions {
 }
 
 const DEFAULT_TIMEOUT_MS = 60_000;
-const DEFAULT_MAX_RETRIES = 3;
+// 4 retries (5 total attempts) so the rate-limit curve actually reaches the
+// 60s ceiling on the final retry (1s/4s/16s/60s). 5xx retries follow a much
+// smaller curve and still benefit from the extra attempt.
+const DEFAULT_MAX_RETRIES = 4;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,7 +74,11 @@ export async function requestAuvik(this: Context, opts: AuvikRequestOptions): Pr
       const retriable = rateLimited || status === 503 || status === 504;
       if (retriable && attempt < maxRetries) {
         const retryAfterHeader = (error as any)?.response?.headers?.['retry-after'];
-        const retryAfterMs = retryAfterHeader ? Number(retryAfterHeader) * 1000 : undefined;
+        // Retry-After can be delta-seconds (number) or an HTTP-date. Only
+        // honour numeric form; HTTP-date parses to NaN and would fall through
+        // to a NaN backoff, which setTimeout treats as 0 (hot retry loop).
+        const retryAfterSeconds = retryAfterHeader != null ? Number(retryAfterHeader) : NaN;
+        const retryAfterMs = Number.isFinite(retryAfterSeconds) ? retryAfterSeconds * 1000 : undefined;
         // Rate-limited: bigger exponent + bigger jitter so the 60s ceiling is
         // reachable (1s/4s/16s/60s) and sibling workers don't lockstep.
         // 5xx: keep the existing modest curve (1s/2s/4s, 10s ceiling).

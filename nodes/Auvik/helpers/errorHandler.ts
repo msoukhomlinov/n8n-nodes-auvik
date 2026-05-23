@@ -3,8 +3,9 @@ import type { JsonObject } from 'n8n-workflow';
 
 // Auvik empirically returns HTTP 403 with one of these words in the body
 // when throttling (rather than 429). Not guaranteed by Auvik public docs —
-// revisit if behaviour drifts.
-export const RATE_LIMIT_PATTERN = /rate[\s-]?limit|quota|throttl/i;
+// revisit if behaviour drifts. "quota" alone is too ambiguous (permission
+// errors mention quotas too) so it is not included.
+export const RATE_LIMIT_PATTERN = /rate[\s-]?limit|throttl|too\s*many\s*requests/i;
 
 // n8n's helpers.request (request-promise-native) puts the parsed payload on
 // error.error when json:true; raw bodies live on error.response.body. Probe
