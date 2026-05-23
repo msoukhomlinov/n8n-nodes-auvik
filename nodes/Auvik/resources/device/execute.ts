@@ -120,6 +120,19 @@ export async function executeDevice(this: IExecuteFunctions): Promise<INodeExecu
     }
   }
 
+  if (operation === 'getLifecycle') {
+    const id = this.getNodeParameter('id', 0) as string;
+    const resp = await requestAuvik.call(this, {
+      method: 'GET',
+      path: `/inventory/device/lifecycle/${encodeURIComponent(id)}`,
+      apiVersion: 'v1',
+    });
+    if (resp?.data != null) {
+      const data = Array.isArray(resp.data) ? resp.data : [resp.data];
+      for (const d of data) returnData.push(d as IDataObject);
+    }
+  }
+
   return [this.helpers.returnJsonArray(returnData)];
 }
 

@@ -13,6 +13,12 @@ export const deviceOperations: INodeProperties = {
   },
   options: [
     {
+      name: 'Get Lifecycle',
+      value: 'getLifecycle',
+      action: 'Get lifecycle info for a device',
+      description: 'Read end-of-life / end-of-support lifecycle data for a single device by ID',
+    },
+    {
       name: 'Get Many',
       value: 'getMany',
       action: 'Get many devices info',
@@ -348,7 +354,7 @@ export const deviceFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['device'],
-        operation: ['getOne'],
+        operation: ['getOne', 'getWarranty', 'getLifecycle'],
       },
     },
   },
