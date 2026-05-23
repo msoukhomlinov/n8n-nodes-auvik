@@ -7,7 +7,8 @@
 - Friendly error messages for 401/403/404/429/5xx responses when Auvik returns no JSON:API `errors[]` body
 
 ### Fixed
-- HTTP retry layer now detects Auvik's 403-rate-limit responses (body containing "rate limit", "quota", or "throttle") and retries them with a wider backoff curve and 60s ceiling. 5xx retries unchanged.
+- HTTP retry layer now detects Auvik's 403-rate-limit responses (body matching "rate limit", "throttle", or "too many requests") and retries them on a 1s/4s/16s/60s curve. 5xx retries unchanged (1s/2s/4s, 10s ceiling). Default retries bumped from 3 to 4 so the rate-limit curve actually reaches the 60s ceiling.
+- `Retry-After` header now only honours delta-seconds form. HTTP-date form previously parsed to `NaN`, which `setTimeout` treats as 0 — a hot retry loop. Non-numeric values fall back to the exponential curve.
 - All non-retried HTTP failures now route through `mapAuvikError`, surfacing vendor detail and friendly status messages instead of a generic "Auvik API request failed".
 
 ## [0.5.5] - 2025-11-06
