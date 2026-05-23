@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.6] - 2026-05-23
+### Added
+- Device (v1): `Get Warranty` operation (`GET /inventory/device/warranty/{id}`)
+- Device (v1): `Get Lifecycle` operation (`GET /inventory/device/lifecycle/{id}`)
+- Friendly error messages for 401/403/404/429/5xx responses when Auvik returns no JSON:API `errors[]` body
+
+### Fixed
+- HTTP retry layer now detects Auvik's 403-rate-limit responses (body containing "rate limit", "quota", or "throttle") and retries them with a wider backoff curve and 60s ceiling. 5xx retries unchanged.
+- All non-retried HTTP failures now route through `mapAuvikError`, surfacing vendor detail and friendly status messages instead of a generic "Auvik API request failed".
+
 ## [0.5.5] - 2025-11-06
 ### Added
 - Device (v1): Client-side filtering by device name
