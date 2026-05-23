@@ -24,6 +24,12 @@ export const deviceOperations: INodeProperties = {
       action: 'Get one device info',
       description: 'Read a single device’s info by ID',
     },
+    {
+      name: 'Get Warranty',
+      value: 'getWarranty',
+      action: 'Get warranty info for a device',
+      description: 'Read warranty / lifecycle warranty details for a single device by ID',
+    },
   ],
   default: 'getMany',
 };
