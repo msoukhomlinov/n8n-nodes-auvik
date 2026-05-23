@@ -7,7 +7,7 @@ This is the first public release of the Auvik community node for n8n. See the [C
 
 ### Features
 - Tenants: list, detail
-- Devices (v1): info with filters, `include` and `fields[]`
+- Devices (v1): info with filters, `include` and `fields[]`, warranty, lifecycle
 - Device V2 (Beta): high-volume device listing with updated schema and filters
 - Networks: info and detail
 - Interfaces: info
@@ -74,6 +74,8 @@ The node now supports Auvik's API v2 for Device operations, offering improved pe
 - Devices: filters include `tenants`, `deviceType`, `vendorName`, `makeModel`, `onlineStatus`,
   `modifiedAfter`, `notSeenSince`, `stateKnown`, `trafficInsightsStatus`, and `networks`.
   You can include `deviceDetail` and restrict via `fields[deviceDetail]`.
+  Per-device endpoints: `Get One` (info), `Get Warranty` (`/inventory/device/warranty/{id}`),
+  `Get Lifecycle` (`/inventory/device/lifecycle/{id}`).
 - Networks: filter by networkType/scanStatus, include `networkDetail`. Detail endpoints are available:
   - Read Multiple Networks’ Details (`GET /v1/inventory/network/detail`) supports common filters plus `filter[scope]`.
   - Read a Single Network’s Details (`GET /v1/inventory/network/detail/{id}`).
