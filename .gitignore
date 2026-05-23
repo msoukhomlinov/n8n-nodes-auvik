@@ -40,3 +40,11 @@ coverage/
 .cursorconfig
 .cursorignore
 .cursorrules
+
+# Claude / memory
+.remember/
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.claude.json
+.mcp.json
